@@ -35,6 +35,8 @@
 #include "../iselectinstrumentscenario.h"
 #include "inotationundostack.h"
 
+#include "mscoreerrorscontroller.h"
+
 #include "engraving/dom/engravingitem.h"
 #include "engraving/dom/elementgroup.h"
 #include "engraving/rendering/paintoptions.h"
@@ -178,7 +180,8 @@ public:
     void startEditGrip(EngravingItem* element, mu::engraving::Grip grip) override;
     void endEditGrip() override;
 
-    bool isElementEditStarted() const override;
+    bool isEditingElement() const override;
+    muse::async::Notification isEditingElementChanged() const override;
     void startEditElement(EngravingItem* element) override;
     void changeEditElement(EngravingItem* newElement) override;
     bool isEditAllowed(QKeyEvent* event) override;
@@ -199,7 +202,7 @@ public:
 
     void copySelection() override;
     void copyLyrics() override;
-    muse::Ret repeatSelection() override;
+    void repeatSelection() override;
     void pasteSelection(const Fraction& scale = Fraction(1, 1)) override;
     void swapSelection() override;
     void deleteSelection() override;
@@ -275,6 +278,8 @@ public:
     void replaceSelectedNotesWithSlashes() override;
     void changeEnharmonicSpelling(bool) override;
     void spellPitches() override;
+    void spellPitchesWithSharps() override;
+    void spellPitchesWithFlats() override;
     void regroupNotesAndRests() override;
     void resequenceRehearsalMarks() override;
 
@@ -335,6 +340,8 @@ public:
     muse::async::Channel<ShowItemRequest> showItemRequested() const override;
 
     void setGetViewRectFunc(const std::function<muse::RectF()>& func) override;
+
+    void checkAndShowError() override;
 
     void toggleDebugShowGapRests() override;
 
@@ -439,6 +446,8 @@ private:
     bool dropCanvas(EngravingItem* e);
     void resetDropData();
 
+    void repeatListSelection(const engraving::Selection& selection);
+
     void doFinishAddFretboardDiagram();
 
     bool selectInstrument(mu::engraving::InstrumentChange* instrumentChange);
@@ -524,6 +533,8 @@ private:
 
     std::shared_ptr<NotationSelectionFilter> m_selectionFilter = nullptr;
 
+    std::shared_ptr<MScoreErrorsController> m_errorsController = nullptr;
+
     DragData m_dragData;
     muse::async::Notification m_dragChanged;
     std::vector<muse::LineF> m_anchorLines;
@@ -531,6 +542,8 @@ private:
     QDrag* m_outgoingDrag = nullptr;
 
     mu::engraving::EditData m_editData;
+
+    muse::async::Notification m_isEditingElementChanged;
 
     muse::async::Notification m_textEditingStarted;
     muse::async::Notification m_textEditingChanged;

@@ -202,8 +202,9 @@ bool MidiRemote::writeMidiMappings(const MidiMappingList& midiMappings) const
     }
 
     writer.endElement();
+    writer.flush();
 
-    return mappingsFile.hasError();
+    return !mappingsFile.hasError();
 }
 
 void MidiRemote::writeMidiMapping(XmlStreamWriter& writer, const MidiControlsMapping& midiMapping) const

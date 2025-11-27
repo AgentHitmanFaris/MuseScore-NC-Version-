@@ -736,14 +736,14 @@
                     <item>
                      <widget class="QRadioButton" name="swingEighth">
                       <property name="text">
-                       <string>Eighth note</string>
+                       <string>Eighth</string>
                       </property>
                      </widget>
                     </item>
                     <item>
                      <widget class="QRadioButton" name="swingSixteenth">
                       <property name="text">
-                       <string>Sixteenth note</string>
+                       <string>Sixteenth</string>
                       </property>
                      </widget>
                     </item>
@@ -767,7 +767,7 @@
                     <item>
                      <widget class="QLabel" name="label_3">
                       <property name="text">
-                       <string>Select swing ratio:</string>
+                       <string>Swing ratio:</string>
                       </property>
                       <property name="buddy">
                        <cstring>swingBox</cstring>
@@ -4098,7 +4098,7 @@
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="dividerLeftSize">
                   <property name="suffix">
-                   <string>%</string>
+                   <string notr="true">%</string>
                   </property>
                   <property name="decimals">
                    <number>0</number>
@@ -4400,7 +4400,7 @@
                 <item row="1" column="1">
                  <widget class="QDoubleSpinBox" name="dividerRightSize">
                   <property name="suffix">
-                   <string>%</string>
+                   <string notr="true">%</string>
                   </property>
                   <property name="decimals">
                    <number>0</number>

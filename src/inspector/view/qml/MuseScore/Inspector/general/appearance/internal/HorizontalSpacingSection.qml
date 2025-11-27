@@ -22,7 +22,7 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 import MuseScore.Inspector 1.0
 
 import "../../../common"
@@ -57,6 +57,7 @@ Item {
 
         titleText: qsTrc("inspector", "Leading space")
         propertyItem: root.leadingSpace
+        measureUnitsSymbol: qsTrc("global", "sp")
 
         icon: IconCode.HORIZONTAL
     }
@@ -73,6 +74,12 @@ Item {
 
         titleText: qsTrc("inspector", "Measure width")
         propertyItem: root.measureWidth
+        measureUnitsSymbol: "%"
+
+        decimals: 0
+        step: 5
+        minValue: 0
+        maxValue: 1000
 
         icon: IconCode.HORIZONTAL
     }

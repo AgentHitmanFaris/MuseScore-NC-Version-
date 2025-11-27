@@ -214,6 +214,10 @@
 #include "stubs/playback/playbackstubmodule.h"
 #endif
 
+#ifdef MUE_BUILD_PREFERENCES_MODULE
+#include "preferences/preferencesmodule.h"
+#endif
+
 #ifdef MUE_BUILD_PRINT_MODULE
 #include "print/printmodule.h"
 #endif
@@ -354,6 +358,7 @@ std::shared_ptr<muse::IApplication> AppFactory::newGuiApp(const CmdOptions& opti
 
     app->addModule(new mu::inspector::InspectorModule());
     app->addModule(new mu::instrumentsscene::InstrumentsSceneModule());
+    app->addModule(new muse::extensions::ExtensionsModule());
     app->addModule(new muse::languages::LanguagesModule());
     app->addModule(new muse::learn::LearnModule());
     app->addModule(new muse::mi::MultiInstancesModule());
@@ -361,7 +366,9 @@ std::shared_ptr<muse::IApplication> AppFactory::newGuiApp(const CmdOptions& opti
     app->addModule(new mu::notation::NotationModule());
     app->addModule(new mu::palette::PaletteModule());
     app->addModule(new mu::playback::PlaybackModule());
-    app->addModule(new muse::extensions::ExtensionsModule());
+#ifdef MUE_BUILD_PREFERENCES_MODULE
+    app->addModule(new mu::preferences::PreferencesModule());
+#endif
 
 #ifdef MUE_BUILD_PRINT_MODULE
     app->addModule(new mu::print::PrintModule());

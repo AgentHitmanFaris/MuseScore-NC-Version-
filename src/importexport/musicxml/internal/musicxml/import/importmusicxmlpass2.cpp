@@ -87,6 +87,7 @@
 #include "engraving/dom/tuplet.h"
 #include "engraving/dom/utils.h"
 #include "engraving/dom/volta.h"
+#include "engraving/editing/transpose.h"
 #include "engraving/engravingerrors.h"
 
 #include "importmusicxmllogger.h"
@@ -294,7 +295,7 @@ static void xmlSetPitch(Note* n, int step, int alter, double tuning, int octave,
     pitch = std::clamp(pitch, 0, 127);
 
     int tpc2 = step2tpc(step, AccidentalVal(alter));
-    int tpc1 = mu::engraving::transposeTpc(tpc2, intval, true);
+    int tpc1 = Transpose::transposeTpc(tpc2, intval, true);
     n->setPitch(pitch, tpc1, tpc2);
     n->setTuning(tuning);
     //LOGD("  pitch=%d tpc1=%d tpc2=%d", n->pitch(), n->tpc1(), n->tpc2());
@@ -941,8 +942,7 @@ static void addLyrics(MusicXmlLogger* logger, const XmlStreamReader* const xmlre
                       const std::set<Lyrics*>& extLyrics,
                       MusicXmlLyricsExtend& extendedLyrics)
 {
-    for (const int lyricNo : muse::keys(numbrdLyrics)) {
-        Lyrics* const lyric = numbrdLyrics.at(lyricNo);
+    for (const auto& [lyricNo, lyric] : numbrdLyrics) {
         addLyric(logger, xmlreader, cr, lyric, lyricNo, extendedLyrics);
         if (muse::contains(extLyrics, lyric)) {
             extendedLyrics.addLyric(lyric);
@@ -953,8 +953,7 @@ static void addLyrics(MusicXmlLogger* logger, const XmlStreamReader* const xmlre
 static void addGraceNoteLyrics(const std::map<int, Lyrics*>& numberedLyrics, std::set<Lyrics*> extendedLyrics,
                                std::vector<GraceNoteLyrics>& gnLyrics)
 {
-    for (const int lyricNo : muse::keys(numberedLyrics)) {
-        Lyrics* const lyric = numberedLyrics.at(lyricNo);
+    for (const auto& [lyricNo, lyric] : numberedLyrics) {
         if (lyric) {
             bool extend = muse::contains(extendedLyrics, lyric);
             const GraceNoteLyrics gnl = GraceNoteLyrics(lyric, extend, lyricNo);
@@ -2097,7 +2096,7 @@ void MusicXmlParserPass2::scorePartwise()
     }
     addError(checkAtEndElement(m_e, u"score-partwise"));
 
-    for (EngravingItem* sysEl : muse::values(m_sysElements)) {
+    for (const auto& [_, sysEl] : m_sysElements) {
         m_score->undoAddElement(sysEl);
 
         // Remove potential duplicated text for text and text lines
@@ -2628,6 +2627,14 @@ static void addGraceChordsAfter(Chord* c, GraceChordList& gcl, size_t& gac)
     while (gac > 0) {
         if (gcl.size() > 0) {
             Chord* graceChord = muse::takeFirst(gcl);
+            std::vector<EngravingItem*> el = graceChord->el(); // copy, because modified during loop
+            for (EngravingItem* e : el) {
+                if (e->isFermata()) {
+                    e->setParent(c->segment());
+                    c->segment()->add(e);
+                    graceChord->removeFermata(toFermata(e));
+                }
+            }
             graceChord->toGraceAfter();
             c->add(graceChord);              // TODO check if same voice ?
             coerceGraceCue(c, graceChord);
@@ -2653,6 +2660,7 @@ static void addGraceChordsBefore(Chord* c, GraceChordList& gcl)
         std::vector<EngravingItem*> el = gc->el(); // copy, because modified during loop
         for (EngravingItem* e : el) {
             if (e->isFermata()) {
+                e->setParent(c->segment());
                 c->segment()->add(e);
                 gc->removeFermata(toFermata(e));
             }
@@ -2910,7 +2918,7 @@ void MusicXmlParserPass2::measure(const String& partId, const Fraction time)
     fillGapsInFirstVoices(measure, part);
 
     // Prevent any beams from extending into the next measure
-    for (Beam* beam : muse::values(beams)) {
+    for (auto& [_, beam] : beams) {
         if (beam) {
             removeBeam(beam);
         }
@@ -5178,7 +5186,7 @@ void MusicXmlParserDirection::dashes(const String& type, const int number,
 {
     const MusicXmlExtendedSpannerDesc& spdesc = m_pass2.getSpanner({ ElementType::HAIRPIN, number });
     if (type == u"start") {
-        TextLineBase* b = spdesc.isStopped ? toTextLine(spdesc.sp) : Factory::createTextLine(m_score->dummy());
+        TextLineBase* b = spdesc.isStopped ? toTextLineBase(spdesc.sp) : Factory::createTextLine(m_score->dummy());
         // if (placement.empty()) placement = "above";  // TODO ? set default
 
         // hack: combine with a previous words element
@@ -5202,7 +5210,7 @@ void MusicXmlParserDirection::dashes(const String& type, const int number,
         // use MusicXML specific type instead
         starts.push_back(MusicXmlSpannerDesc(b, ElementType::TEXTLINE, number));
     } else if (type == u"stop") {
-        TextLine* b = spdesc.isStarted ? toTextLine(spdesc.sp) : Factory::createTextLine(m_score->dummy());
+        TextLineBase* b = spdesc.isStarted ? toTextLineBase(spdesc.sp) : Factory::createTextLine(m_score->dummy());
         stops.push_back(MusicXmlSpannerDesc(b, ElementType::TEXTLINE, number));
     }
     m_e.skipCurrentElement();
@@ -5999,7 +6007,7 @@ void MusicXmlParserPass2::key(const String& partId, Measure* measure, const Frac
             Key cKey = tKey;
             Interval v = m_pass1.getPart(partId)->instrument()->transpose();
             if (!v.isZero() && !m_score->style().styleB(Sid::concertPitch)) {
-                cKey = transposeKey(tKey, v);
+                cKey = Transpose::transposeKey(tKey, v);
                 // if there are more than 6 accidentals in transposing key, it cannot be PreferSharpFlat::AUTO
                 Part* part = m_pass1.getPart(partId);
                 if ((tKey > 6 || tKey < -6) && part->preferSharpFlat() == PreferSharpFlat::AUTO) {

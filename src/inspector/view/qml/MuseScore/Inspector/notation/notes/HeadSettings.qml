@@ -22,7 +22,7 @@
 import QtQuick 2.0
 import QtQuick.Controls 2.0
 import MuseScore.Inspector 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 import Muse.Ui 1.0
 import "../../common"
 import "internal"
@@ -169,6 +169,7 @@ FocusableItem {
                     id: noteOffsetSection
                     titleText: qsTrc("inspector", "Notehead offset")
                     propertyItem: root.headModel ? root.headModel.offset : null
+                    measurementUnits: root.headModel?.measurementUnits ?? CommonTypes.UNITS_UNKNOWN
 
                     navigationName: "NoteHeadOffsetSection"
                     navigationPanel: root.navigationPanel

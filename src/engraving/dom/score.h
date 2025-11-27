@@ -156,6 +156,7 @@ enum class Key : signed char;
 enum class HairpinType : signed char;
 enum class SegmentType;
 enum class OttavaType : unsigned char;
+enum class Prefer : char;
 enum class Voicing : signed char;
 enum class HDuration : signed char;
 enum class AccidentalType : unsigned char;
@@ -444,11 +445,6 @@ public:
 
     void realtimeAdvance(bool allowTransposition);
 
-    bool transpose(Note* n, Interval, bool useSharpsFlats);
-    void transposeKeys(staff_idx_t staffStart, staff_idx_t staffEnd, const Fraction& tickStart, const Fraction& tickEnd, bool flip = false);
-    bool transpose(TransposeMode mode, TransposeDirection, Key transposeKey, int transposeInterval, bool trKeys, bool transposeChordNames,
-                   bool useDoubleSharpsFlats);
-
     bool appendMeasuresFromScore(Score* score, const Fraction& startTick, const Fraction& endTick);
     bool appendScore(Score*, bool addPageBreak = false, bool addSectionBreak = true);
 
@@ -485,8 +481,6 @@ public:
     void spellNotelist(std::vector<Note*>& notes);
     void undoChangeTpc(Note* note, int tpc);
     void undoChangeChordRestLen(ChordRest* cr, const TDuration&);
-    void undoTransposeHarmony(Harmony*, Interval interval, bool doubleSharpFlat = true);
-    void undoTransposeHarmonyDiatonic(Harmony*, int interval, bool doubleSharpFlat, bool transposeKeys);
     void undoExchangeVoice(Measure* measure, voice_idx_t val1, voice_idx_t val2, staff_idx_t staff1, staff_idx_t staff2);
     void undoRemovePart(Part* part, size_t partIdx = muse::nidx);
     void undoInsertPart(Part* part, size_t targetPartIndex);
@@ -719,8 +713,7 @@ public:
     void setIsOpen(bool open);
 
     void spell();
-    void spell(staff_idx_t startStaff, staff_idx_t endStaff, Segment* startSegment, Segment* endSegment);
-    void spell(Note*);
+    void spellWithSharpsOrFlats(Prefer prefer);
     void changeEnharmonicSpelling(bool both);
 
     Fraction nextSeg(const Fraction& tick, int track);
@@ -771,8 +764,6 @@ public:
 
     bool pasteStaff(XmlReader&, Segment* dst, staff_idx_t staffIdx, Fraction scale = Fraction(1, 1));
     void pasteSymbols(XmlReader& e, ChordRest* dst);
-
-    static void transposeChord(Chord* c, const Fraction& tick);
 
     BeatType tick2beatType(const Fraction& tick) const;
 
@@ -932,8 +923,6 @@ public:
 
     void cmdSelectAll();
     void cmdSelectSection();
-    void transposeSemitone(int semitone);
-    void transposeDiatonicAlterations(TransposeDirection direction);
 
     struct InsertMeasureOptions {
         InsertMeasureOptions() {}
@@ -964,6 +953,7 @@ public:
     const std::multimap<int, Spanner*>& spanner() const { return m_spanner.map(); }
     SpannerMap& spannerMap() { return m_spanner; }
     const SpannerMap& spannerMap() const { return m_spanner; }
+    std::vector<Spanner*> spannerList() const; // Return all spanners as a vector for Plugin API
     bool isSpannerStartEnd(const Fraction& tick, track_idx_t track) const;
     void removeSpanner(Spanner*);
     void addSpanner(Spanner*, bool computeStartEnd = true);
@@ -990,9 +980,6 @@ public:
 
     std::vector<staff_idx_t> uniqueStaves() const;
 
-    void transpositionChanged(Part* part, Interval oldTransposition, Fraction tickStart = { 0, 1 }, Fraction tickEnd = { -1, 1 });
-    void transpositionChanged(Part* part, const Fraction& instrumentTick, Interval oldTransposition);
-
     void moveUp(ChordRest*);
     void moveDown(ChordRest*);
     EngravingItem* upAlt(EngravingItem*);
@@ -1004,11 +991,15 @@ public:
     EngravingItem* lastElement(bool frame = true);
 
     size_t nmeasures() const;
-    bool hasLyrics();
-    bool hasHarmonies();
-    int  lyricCount();
-    int  harmonyCount();
-    String extractLyrics();
+
+    bool hasHarmonies() const;
+    int harmonyCount() const;
+
+    bool hasLyrics() const;
+    int  lyricCount() const;
+    std::vector<Lyrics*> lyrics() const;
+    String extractLyrics() const;
+
     int keysig();
     int duration();
     int durationWithoutRepeats();

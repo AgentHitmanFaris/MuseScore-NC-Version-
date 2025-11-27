@@ -22,7 +22,7 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents 1.0
+import Muse.UiComponents
 import MuseScore.Inspector 1.0
 
 import "../../../common"
@@ -39,6 +39,7 @@ SpinBoxPropertyView {
 
     titleText: qsTrc("inspector", "Minimum distance")
     propertyItem: minimumDistance
+    measureUnitsSymbol: qsTrc("global", "sp")
 
     icon: IconCode.VERTICAL
 }

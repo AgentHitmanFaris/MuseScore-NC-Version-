@@ -35,6 +35,7 @@
 #include "editing/addremoveelement.h"
 #include "editing/mscoreview.h"
 #include "editing/splitjoinmeasure.h"
+#include "editing/transpose.h"
 
 #include "style/style.h"
 #include "style/defaultstyle.h"
@@ -53,8 +54,8 @@
 #include "capo.h"
 #include "chord.h"
 #include "clef.h"
-#include "excerpt.h"
 #include "dynamic.h"
+#include "excerpt.h"
 #include "factory.h"
 #include "fermata.h"
 #include "glissando.h"
@@ -83,12 +84,12 @@
 #include "rest.h"
 #include "scoreorder.h"
 #include "segment.h"
-#include "stafftextbase.h"
 #include "select.h"
 #include "shadownote.h"
 #include "sig.h"
 #include "slur.h"
 #include "staff.h"
+#include "stafftextbase.h"
 #include "stafftype.h"
 #include "synthesizerstate.h"
 #include "system.h"
@@ -856,14 +857,20 @@ void Score::spell()
 {
     for (staff_idx_t i = 0; i < nstaves(); ++i) {
         std::vector<Note*> notes;
-        for (Segment* s = firstSegment(SegmentType::All); s; s = s->next1()) {
+        for (Segment* s = firstSegment(SegmentType::ChordRest); s; s = s->next1(SegmentType::ChordRest)) {
             track_idx_t strack = i * VOICES;
             track_idx_t etrack = strack + VOICES;
             for (track_idx_t track = strack; track < etrack; ++track) {
                 EngravingItem* e = s->element(track);
-                if (e && e->type() == ElementType::CHORD) {
-                    std::copy_if(toChord(e)->notes().begin(), toChord(e)->notes().end(),
+                if (e && e->isChord()) {
+                    Chord* c = toChord(e);
+                    std::copy_if(c->notes().begin(), c->notes().end(),
                                  std::back_inserter(notes), [this](EngravingItem* ce) { return selection().isNone() || ce->selected(); });
+                    for (Chord* g : c->graceNotes()) {
+                        std::copy_if(g->notes().begin(), g->notes().end(),
+                                     std::back_inserter(notes),
+                                     [this](EngravingItem* ce) { return selection().isNone() || ce->selected(); });
+                    }
                 }
             }
         }
@@ -871,23 +878,30 @@ void Score::spell()
     }
 }
 
-void Score::spell(staff_idx_t startStaff, staff_idx_t endStaff, Segment* startSegment, Segment* endSegment)
+void Score::spellWithSharpsOrFlats(Prefer prefer)
 {
-    for (staff_idx_t i = startStaff; i < endStaff; ++i) {
-        std::vector<Note*> notes;
-        for (Segment* s = startSegment; s && s != endSegment; s = s->next()) {
-            track_idx_t strack = i * VOICES;
-            track_idx_t etrack = strack + VOICES;
-            for (track_idx_t track = strack; track < etrack; ++track) {
-                EngravingItem* e = s->element(track);
-                if (e && e->type() == ElementType::CHORD) {
-                    notes.insert(notes.end(),
-                                 toChord(e)->notes().begin(),
-                                 toChord(e)->notes().end());
-                }
-            }
+    std::vector<Note*> notes = selection().noteList();
+    for (Note* n : notes) {
+        Interval v = n->part()->instrument(n->chord()->tick())->transpose();
+        int tpc1, tpc2;
+        if (n->staff()->concertPitch() || v.isZero()) {
+            // Note: using Key::C always and ignoring actual key signature. Otherwise, "respell with flats" would still use sharps
+            // sometimes if they're in the key, and vice versa, which seems contrary to the intent of the command.
+            tpc1 = pitch2tpc(n->pitch(), Key::C, prefer);
+            v.flip();
+            tpc2 = Transpose::transposeTpc(tpc1, v, true);
+        } else {
+            // Spell the transposed pitch first, then convert to concert pitch
+            int writtenPitch = n->pitch() - v.chromatic;
+            tpc2 = pitch2tpc(writtenPitch, Key::C, prefer);
+            tpc1 = Transpose::transposeTpc(tpc2, v, true);
         }
-        spellNotelist(notes);
+        n->undoChangeProperty(Pid::TPC1, tpc1);
+        n->undoChangeProperty(Pid::TPC2, tpc2);
+        for (Note* tied : n->tiedNotes()) {
+            tied->undoChangeProperty(Pid::TPC1, tpc1);
+            tied->undoChangeProperty(Pid::TPC2, tpc2);
+        }
     }
 }
 
@@ -948,98 +962,6 @@ void Score::changeEnharmonicSpelling(bool both)
             }
         }
     }
-}
-
-//---------------------------------------------------------
-//   prevNote
-//---------------------------------------------------------
-
-Note* prevNote(Note* n)
-{
-    Chord* chord = n->chord();
-    Segment* seg = chord->segment();
-    const std::vector<Note*> nl = chord->notes();
-    auto i = std::find(nl.begin(), nl.end(), n);
-    if (i != nl.begin()) {
-        return *(i - 1);
-    }
-    staff_idx_t staff      = n->staffIdx();
-    track_idx_t startTrack = staff * VOICES + n->voice() - 1;
-    track_idx_t endTrack   = 0;
-    while (seg) {
-        if (seg->segmentType() == SegmentType::ChordRest) {
-            for (track_idx_t track = startTrack; track >= endTrack; --track) {
-                EngravingItem* e = seg->element(track);
-                if (e && e->type() == ElementType::CHORD) {
-                    return toChord(e)->upNote();
-                }
-            }
-        }
-        seg = seg->prev1();
-        startTrack = staff * VOICES + VOICES - 1;
-    }
-    return n;
-}
-
-//---------------------------------------------------------
-//   nextNote
-//---------------------------------------------------------
-
-static Note* nextNote(Note* n)
-{
-    Chord* chord = n->chord();
-    const std::vector<Note*> nl = chord->notes();
-    auto i = std::find(nl.begin(), nl.end(), n);
-    if (i != nl.end()) {
-        ++i;
-        if (i != nl.end()) {
-            return *i;
-        }
-    }
-    Segment* seg   = chord->segment();
-    staff_idx_t staff      = n->staffIdx();
-    track_idx_t startTrack = staff * VOICES + n->voice() + 1;
-    track_idx_t endTrack   = staff * VOICES + VOICES;
-    while (seg) {
-        if (seg->segmentType() == SegmentType::ChordRest) {
-            for (track_idx_t track = startTrack; track < endTrack; ++track) {
-                EngravingItem* e = seg->element(track);
-                if (e && e->type() == ElementType::CHORD) {
-                    return ((Chord*)e)->downNote();
-                }
-            }
-        }
-        seg = seg->next1();
-        startTrack = staff * VOICES;
-    }
-    return n;
-}
-
-//---------------------------------------------------------
-//   spell
-//---------------------------------------------------------
-
-void Score::spell(Note* note)
-{
-    std::vector<Note*> notes;
-
-    notes.push_back(note);
-    Note* nn = nextNote(note);
-    notes.push_back(nn);
-    nn = nextNote(nn);
-    notes.push_back(nn);
-    nn = nextNote(nn);
-    notes.push_back(nn);
-
-    nn = prevNote(note);
-    notes.insert(notes.begin(), nn);
-    nn = prevNote(nn);
-    notes.insert(notes.begin(), nn);
-    nn = prevNote(nn);
-    notes.insert(notes.begin(), nn);
-
-    int opt = computeWindow(notes, 0, 7);
-    note->setTpc(tpc(3, note->pitch(), opt));
 }
 
 //---------------------------------------------------------
@@ -2758,7 +2680,7 @@ void Score::adjustKeySigs(track_idx_t sidx, track_idx_t eidx, KeyList km)
             Interval v = staff->part()->instrument(tick)->transpose();
             if (!v.isZero() && !style().styleB(Sid::concertPitch) && !key.isAtonal()) {
                 v.flip();
-                key.setKey(transposeKey(key.concertKey(), v, staff->part()->preferSharpFlat()));
+                key.setKey(Transpose::transposeKey(key.concertKey(), v, staff->part()->preferSharpFlat()));
             }
             staff->setKey(tick, key);
 
@@ -2838,7 +2760,7 @@ KeyList Score::keyList() const
     if (firstStaff && !masterScore()->style().styleB(Sid::concertPitch)
         && (firstStaff->part()->instrument()->transpose().chromatic || firstStaff->part()->instruments().size() > 1)) {
         int interval = firstStaff->part()->instrument()->transpose().chromatic;
-        normalizedC = transposeKey(normalizedC, interval);
+        normalizedC = Transpose::transposeKey(normalizedC, interval);
     }
 
     // create initial keyevent for transposing instrument if necessary
@@ -3016,7 +2938,7 @@ void Score::cmdConcertPitchChanged(bool flag)
         track_idx_t startTrack = staffIdx * VOICES;
         track_idx_t endTrack   = startTrack + VOICES;
 
-        transposeKeys(staffIdx, staffIdx + 1, Fraction(0, 1), lastSegment()->tick(), !flag);
+        Transpose::transposeKeys(this, staffIdx, staffIdx + 1, Fraction(0, 1), lastSegment()->tick(), !flag);
 
         for (Segment* segment = firstSegment(SegmentType::ChordRest); segment; segment = segment->next1(SegmentType::ChordRest)) {
             interval = staff->transpose(segment->tick());
@@ -3033,7 +2955,7 @@ void Score::cmdConcertPitchChanged(bool flag)
                     // just ones resulting from mmrests
                     Harmony* he = toHarmony(se);              // toHarmony() does not work as e is an ScoreElement
                     if (he->staff() == h->staff()) {
-                        undoTransposeHarmony(he, interval);
+                        Transpose::undoTransposeHarmony(this, he, interval);
                     }
                 }
                 //realized harmony should be invalid after a transpose command
@@ -4497,6 +4419,20 @@ void Score::addSpanner(Spanner* s, bool computeStartEnd)
 }
 
 //---------------------------------------------------------
+//   spannerList
+//---------------------------------------------------------
+
+std::vector<Spanner*> Score::spannerList() const
+{
+    std::vector<Spanner*> result;
+    const std::multimap<int, Spanner*>& spannerMap = m_spanner.map();
+    for (auto it = spannerMap.begin(); it != spannerMap.end(); ++it) {
+        result.push_back(it->second);
+    }
+    return result;
+}
+
+//---------------------------------------------------------
 //   removeSpanner
 //---------------------------------------------------------
 
@@ -4994,7 +4930,7 @@ ChordRest* Score::cmdTopStaff(ChordRest* cr)
 //   hasLyrics
 //---------------------------------------------------------
 
-bool Score::hasLyrics()
+bool Score::hasLyrics() const
 {
     if (!firstMeasure()) {
         return false;
@@ -5016,7 +4952,7 @@ bool Score::hasLyrics()
 //   hasHarmonies
 //---------------------------------------------------------
 
-bool Score::hasHarmonies()
+bool Score::hasHarmonies() const
 {
     if (!firstMeasure()) {
         return false;
@@ -5037,46 +4973,14 @@ bool Score::hasHarmonies()
 //   lyricCount
 //---------------------------------------------------------
 
-int Score::lyricCount()
+int Score::lyricCount() const
 {
-    size_t count = 0;
-    SegmentType st = SegmentType::ChordRest;
-    for (Segment* seg = firstMeasure()->first(st); seg; seg = seg->next1(st)) {
-        for (size_t i = 0; i < ntracks(); ++i) {
-            ChordRest* cr = toChordRest(seg->element(static_cast<int>(i)));
-            if (cr) {
-                count += cr->lyrics().size();
-            }
-        }
-    }
-    return int(count);
+    return int(lyrics().size());
 }
 
-//---------------------------------------------------------
-//   harmonyCount
-//---------------------------------------------------------
-
-int Score::harmonyCount()
+std::vector<Lyrics*> Score::lyrics() const
 {
-    int count = 0;
-    SegmentType st = SegmentType::ChordRest;
-    for (Segment* seg = firstMeasure()->first(st); seg; seg = seg->next1(st)) {
-        for (EngravingItem* e : seg->annotations()) {
-            if (e->type() == ElementType::HARMONY) {
-                count++;
-            }
-        }
-    }
-    return count;
-}
-
-//---------------------------------------------------------
-//   extractLyrics
-//---------------------------------------------------------
-
-String Score::extractLyrics()
-{
-    String result;
+    std::vector<Lyrics*> result;
     masterScore()->setExpandRepeats(true);
     SegmentType st = SegmentType::ChordRest;
     for (size_t track = 0; track < ntracks(); track++) {
@@ -5106,13 +5010,7 @@ String Score::extractLyrics()
                     if (!l) {
                         continue;
                     }
-                    String lyric = l->plainText().trimmed();
-                    LyricsSyllabic ls = l->syllabic();
-                    if (ls == LyricsSyllabic::SINGLE || ls == LyricsSyllabic::END) {
-                        result += lyric + u" ";
-                    } else if (ls == LyricsSyllabic::BEGIN || ls == LyricsSyllabic::MIDDLE) {
-                        result += lyric;
-                    }
+                    result.push_back(l);
                 }
                 m->setPlaybackCount(m->playbackCount() + 1);
                 if (m->endTick() >= endTick) {
@@ -5142,18 +5040,50 @@ String Score::extractLyrics()
                     if (!l) {
                         continue;
                     }
-                    String lyric = l->plainText().trimmed();
-                    LyricsSyllabic ls = l->syllabic();
-                    if (ls == LyricsSyllabic::SINGLE || ls == LyricsSyllabic::END) {
-                        result += lyric + u" ";
-                    } else if (ls == LyricsSyllabic::BEGIN || ls == LyricsSyllabic::MIDDLE) {
-                        result += lyric;
-                    }
+                    result.push_back(l);
                 }
             }
         }
     }
+    return result;
+}
+
+//---------------------------------------------------------
+//   extractLyrics
+//---------------------------------------------------------
+
+String Score::extractLyrics() const
+{
+    String result;
+    std::vector<Lyrics*> list = lyrics();
+    for (const Lyrics* l : list) {
+        String lyric = l->plainText().trimmed();
+        LyricsSyllabic ls = l->syllabic();
+        if (ls == LyricsSyllabic::SINGLE || ls == LyricsSyllabic::END) {
+            result += lyric + u" ";
+        } else if (ls == LyricsSyllabic::BEGIN || ls == LyricsSyllabic::MIDDLE) {
+            result += lyric;
+        }
+    }
     return result.trimmed();
+}
+
+//---------------------------------------------------------
+//   harmonyCount
+//---------------------------------------------------------
+
+int Score::harmonyCount() const
+{
+    int count = 0;
+    SegmentType st = SegmentType::ChordRest;
+    for (Segment* seg = firstMeasure()->first(st); seg; seg = seg->next1(st)) {
+        for (EngravingItem* e : seg->annotations()) {
+            if (e->type() == ElementType::HARMONY) {
+                count++;
+            }
+        }
+    }
+    return count;
 }
 
 //---------------------------------------------------------
@@ -6081,7 +6011,7 @@ void Score::removeSystemLock(const SystemLock* lock)
 void Score::updateSwing()
 {
     for (Staff* s : m_staves) {
-        s->clearSwingList();
+        s->clearSwingMap();
     }
     Measure* fm = firstMeasure();
     if (!fm) {
@@ -6105,10 +6035,10 @@ void Score::updateSwing()
             sp.swingUnit = st->swingParameters().swingUnit;
             if (st->systemFlag()) {
                 for (Staff* sta : m_staves) {
-                    sta->insertIntoSwingList(s->tick(), sp);
+                    sta->insertIntoSwingMap(s->tick(), sp);
                 }
             } else {
-                staff->insertIntoSwingList(s->tick(), sp);
+                staff->insertIntoSwingMap(s->tick(), sp);
             }
         }
     }
