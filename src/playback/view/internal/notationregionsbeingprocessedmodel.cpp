@@ -138,7 +138,7 @@ void NotationRegionsBeingProcessedModel::load()
 
     globalContext()->currentNotationChanged().onNotify(this, [this]() {
         listenViewModeChanges();
-        setRegions(calculateRegions(m_tracksBeingProcessed));
+        updateRegionsBeingProcessed(m_tracksBeingProcessed);
     });
 
     globalContext()->playbackState()->playbackStatusChanged().onReceive(this, [this](muse::audio::PlaybackStatus) {
@@ -146,8 +146,14 @@ void NotationRegionsBeingProcessedModel::load()
     });
 
     configuration()->onlineSoundsShowProgressBarModeChanged().onNotify(this, [this]() {
+        const bool wasEmpty = m_regions.empty();
+
         initShouldShowRegions();
-        setRegions(calculateRegions(m_tracksBeingProcessed));
+        updateRegionsBeingProcessed(m_tracksBeingProcessed);
+
+        if (wasEmpty != m_regions.empty()) {
+            emit isEmptyChanged();
+        }
     });
 }
 
@@ -193,23 +199,16 @@ void NotationRegionsBeingProcessedModel::clear()
     m_onlineSounds.clear();
     m_tracksBeingProcessed.clear();
     initShouldShowRegions();
-    setRegions({});
-}
 
-void NotationRegionsBeingProcessedModel::setRegions(const QList<RegionInfo>& regions)
-{
-    if (m_regions == regions) {
+    if (m_regions.empty()) {
         return;
     }
 
-    const bool wasEmpty = m_regions.empty();
     beginResetModel();
-    m_regions = regions;
+    m_regions.clear();
     endResetModel();
 
-    if (wasEmpty != m_regions.empty()) {
-        emit isEmptyChanged();
-    }
+    emit isEmptyChanged();
 }
 
 void NotationRegionsBeingProcessedModel::onOnlineSoundsChanged()
@@ -245,7 +244,11 @@ void NotationRegionsBeingProcessedModel::onIsPlayingChanged()
     }
 
     m_shouldShowRegions = true;
-    setRegions(calculateRegions(m_tracksBeingProcessed));
+    updateRegionsBeingProcessed(m_tracksBeingProcessed);
+
+    if (!m_tracksBeingProcessed.empty()) {
+        emit isEmptyChanged();
+    }
 }
 
 void NotationRegionsBeingProcessedModel::listenViewModeChanges()
@@ -256,7 +259,7 @@ void NotationRegionsBeingProcessedModel::listenViewModeChanges()
     }
 
     notation->viewModeChanged().onNotify(this, [this]() {
-        setRegions(calculateRegions(m_tracksBeingProcessed));
+        updateRegionsBeingProcessed(m_tracksBeingProcessed);
     });
 }
 
@@ -331,6 +334,8 @@ void NotationRegionsBeingProcessedModel::onChunksReceived(const InstrumentTrackI
         return;
     }
 
+    const bool wasEmpty = m_regions.empty();
+
     TrackInfo& info = it->second;
     info.ranges.clear();
 
@@ -347,17 +352,13 @@ void NotationRegionsBeingProcessedModel::onChunksReceived(const InstrumentTrackI
         }
     }
 
-    if (!shouldUpdate) {
-        return;
+    if (shouldUpdate) {
+        updateRegionsBeingProcessed({ { instrumentTrackId, info } });
     }
 
-    QList<RegionInfo> newRegions = m_regions;
-    newRegions.removeIf([&instrumentTrackId](const RegionInfo& r) {
-        return r.trackId == instrumentTrackId;
-    });
-
-    newRegions.append(calculateRegions({ { instrumentTrackId, info } }));
-    setRegions(newRegions);
+    if (wasEmpty != m_regions.empty()) {
+        emit isEmptyChanged();
+    }
 }
 
 void NotationRegionsBeingProcessedModel::onProgressChanged(const InstrumentTrackId& instrumentTrackId, int progress)
@@ -441,20 +442,23 @@ void NotationRegionsBeingProcessedModel::initShouldShowRegions()
     }
 }
 
-QList<NotationRegionsBeingProcessedModel::RegionInfo> NotationRegionsBeingProcessedModel::calculateRegions(
-    const TracksBeingProcessed& tracks) const
+void NotationRegionsBeingProcessedModel::updateRegionsBeingProcessed(const TracksBeingProcessed& tracks)
 {
     if (!m_shouldShowRegions || tracks.empty()) {
-        return {};
+        return;
     }
 
     const notation::INotationPtr notation = globalContext()->currentNotation();
     if (!notation) {
-        return {};
+        return;
     }
 
     const QTransform matrix = m_notationViewMatrix.value<QTransform>();
-    QList<RegionInfo> regions;
+    QList<RegionInfo> newRegions = m_regions;
+
+    newRegions.removeIf([&tracks](const RegionInfo& r) {
+        return muse::contains(tracks, r.trackId);
+    });
 
     for (const auto& pair : tracks) {
         const Part* part = notation->parts()->part(pair.first.partId);
@@ -463,18 +467,22 @@ QList<NotationRegionsBeingProcessedModel::RegionInfo> NotationRegionsBeingProces
         }
 
         const std::vector<QRectF> newRects = calculateRects(part, pair.second.ranges);
-        regions.reserve(regions.size() + newRects.size());
 
         for (const QRectF& rect : newRects) {
             RegionInfo region;
             region.trackId = pair.first;
             region.logicRect = rect;
             region.viewRect = matrix.mapRect(rect);
-            regions.push_back(region);
+
+            newRegions.push_back(region);
         }
     }
 
-    return regions;
+    if (m_regions != newRegions) {
+        beginResetModel();
+        m_regions = std::move(newRegions);
+        endResetModel();
+    }
 }
 
 std::vector<QRectF> NotationRegionsBeingProcessedModel::calculateRects(const Part* part, const std::vector<TickRange>& ranges) const
@@ -541,17 +549,19 @@ std::vector<QRectF> NotationRegionsBeingProcessedModel::calculateRects(const Par
             logicRect.setWidth(width);
         }
 
-        // Merge with overlapping rects
-        for (auto it = result.begin(); it != result.end();) {
-            if (logicRect.intersects(*it)) {
-                logicRect = logicRect.united(*it);
-                it = result.erase(it);
-            } else {
-                ++it;
+        bool shouldAdd = true;
+
+        for (QRectF& rect: result) {
+            if (rect.intersects(logicRect)) {
+                rect = rect.united(logicRect);
+                shouldAdd = false;
+                break;
             }
         }
 
-        result.push_back(logicRect);
+        if (shouldAdd) {
+            result.push_back(logicRect);
+        }
     }
 
     return result;

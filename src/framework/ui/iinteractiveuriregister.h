@@ -19,8 +19,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-#pragma once
+#ifndef MUSE_UI_IINTERACTIVEURIREGISTER_H
+#define MUSE_UI_IINTERACTIVEURIREGISTER_H
 
 #include <type_traits>
 
@@ -46,11 +46,6 @@ public:
         registerUri(uri, ContainerMeta(ContainerType::Type::QmlDialog, qmlPath));
     }
 
-    void registerQmlUri(const Uri& uri, const QString& qmlModule, const QString& qmlPath)
-    {
-        registerUri(uri, ContainerMeta(ContainerType::Type::QmlDialog, qmlModule, qmlPath));
-    }
-
     template<typename T>
     void registerWidgetUri(const Uri& uri)
     {
@@ -59,3 +54,5 @@ public:
     }
 };
 }
+
+#endif // MUSE_UI_IINTERACTIVEURIREGISTER_H

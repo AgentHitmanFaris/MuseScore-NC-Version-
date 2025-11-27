@@ -1125,7 +1125,6 @@ muse::ByteArray Selection::staffMimeData() const
     }
 
     xml.endElement();
-    xml.flush();
     return buffer.data();
 }
 
@@ -1313,7 +1312,6 @@ muse::ByteArray Selection::symbolListMimeData() const
     }
 
     xml.endElement();
-    xml.flush();
     buffer.close();
     return buffer.data();
 }
@@ -1377,60 +1375,57 @@ std::vector<Note*> Selection::noteList(track_idx_t selTrack) const
 }
 
 //---------------------------------------------------------
-//   checkStartForPartialCopy
-//     return no error if element is NOT a tuplet or is start of a tuplet/tremolo
-//     return error if element is part of a tuplet/tremolo, but not the start
+//   checkStart
+//     return false if element is NOT a tuplet or is start of a tuplet/tremolo
+//     return true  if element is part of a tuplet/tremolo, but not the start
 //---------------------------------------------------------
 
-static MsError checkStartForPartialCopy(EngravingItem* e)
+static bool checkStart(EngravingItem* e)
 {
     if (!e || !e->isChordRest()) {
-        return MsError::MS_NO_ERROR;
+        return false;
     }
-
-    const ChordRest* cr = toChordRest(e);
+    ChordRest* cr = toChordRest(e);
+    bool rv = false;
     if (cr->tuplet()) {
         // check that complete tuplet is selected, all the way up to top level
         Tuplet* tuplet = cr->tuplet();
         while (tuplet) {
             if (tuplet->elements().front() != e) {
-                return MsError::SOURCE_PARTIAL_TUPLET;
+                return true;
             }
             e = tuplet;
             tuplet = tuplet->tuplet();
         }
-    }
-
-    if (cr->isChord()) {
-        const Chord* chord = toChord(cr);
-        const TremoloTwoChord* ttc = chord ? chord->tremoloTwoChord() : nullptr;
-        if (ttc && ttc->chord2() == chord) {
-            return MsError::SOURCE_PARTIAL_TREMOLO;
+    } else if (cr->isChord()) {
+        rv = false;
+        Chord* chord = toChord(cr);
+        if (chord->tremoloTwoChord()) {
+            rv = chord->tremoloTwoChord()->chord2() == chord;
         }
     }
-
-    return MsError::MS_NO_ERROR;
+    return rv;
 }
 
 //---------------------------------------------------------
-//   checkEndForPartialCopy
-//     return no error if element is NOT a tuplet or is end of a tuplet/tremolo
-//     return error if element is part of a tuplet/tremolo, but not the end
+//   checkEnd
+//     return false if element is NOT a tuplet or is end of a tuplet
+//     return true  if element is part of a tuplet, but not the end
 //---------------------------------------------------------
 
-static MsError checkEndForPartialCopy(EngravingItem* e, const Fraction& endTick)
+static bool checkEnd(EngravingItem* e, const Fraction& endTick)
 {
     if (!e || !e->isChordRest()) {
-        return MsError::MS_NO_ERROR;
+        return false;
     }
-
-    const ChordRest* cr = toChordRest(e);
+    ChordRest* cr = toChordRest(e);
+    bool rv = false;
     if (cr->tuplet()) {
         // check that complete tuplet is selected, all the way up to top level
         Tuplet* tuplet = cr->tuplet();
         while (tuplet) {
             if (tuplet->elements().back() != e) {
-                return MsError::SOURCE_PARTIAL_TUPLET;
+                return true;
             }
             e = tuplet;
             tuplet = tuplet->tuplet();
@@ -1438,19 +1433,16 @@ static MsError checkEndForPartialCopy(EngravingItem* e, const Fraction& endTick)
         // also check that the selection extends to the end of the top-level tuplet
         tuplet = toTuplet(e);
         if (tuplet->endTick() > endTick) {
-            return MsError::SOURCE_PARTIAL_TUPLET;
+            return true;
+        }
+    } else if (cr->isChord()) {
+        rv = false;
+        Chord* chord = toChord(cr);
+        if (chord->tremoloTwoChord()) {
+            rv = chord->tremoloTwoChord()->chord1() == chord;
         }
     }
-
-    if (cr->isChord()) {
-        const Chord* chord = toChord(cr);
-        const TremoloTwoChord* ttc = chord ? chord->tremoloTwoChord() : nullptr;
-        if (ttc && ttc->chord1() == chord) {
-            return MsError::SOURCE_PARTIAL_TREMOLO;
-        }
-    }
-
-    return MsError::MS_NO_ERROR;
+    return rv;
 }
 
 //---------------------------------------------------------
@@ -1477,12 +1469,8 @@ bool Selection::canCopy() const
 
             // check first cr in track within selection
             ChordRest* check = m_startSegment->nextChordRest(track);
-            if (check && check->tick() < endTick) {
-                const MsError err = checkStartForPartialCopy(check);
-                if (err != MsError::MS_NO_ERROR) {
-                    MScore::setError(err);
-                    return false;
-                }
+            if (check && check->tick() < endTick && checkStart(check)) {
+                return false;
             }
 
             if (!m_endSegment) {
@@ -1498,9 +1486,7 @@ bool Selection::canCopy() const
                 endSegmentSelection = endSegmentSelection->nextCR(track);
             }
 
-            const MsError err = checkEndForPartialCopy(endSegmentSelection->element(track), endTick);
-            if (err != MsError::MS_NO_ERROR) {
-                MScore::setError(err);
+            if (checkEnd(endSegmentSelection->element(track), endTick)) {
                 return false;
             }
         }

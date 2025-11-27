@@ -75,6 +75,6 @@ set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/view/testcaserunmodel.h
     )
 
-list(APPEND MODULE_LINK muse::draw Qt::Quick)
+list(APPEND MODULE_LINK Qt::Quick)
 
 setup_module()

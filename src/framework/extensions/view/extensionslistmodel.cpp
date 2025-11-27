@@ -54,10 +54,6 @@ void ExtensionsListModel::classBegin()
         load();
     });
 
-    provider()->manifestChanged().onReceive(this, [this](const Manifest& plugin) {
-        updatePlugin(plugin);
-    });
-
     load();
 }
 
@@ -74,6 +70,11 @@ void ExtensionsListModel::load()
 
     std::sort(m_plugins.begin(), m_plugins.end(), [](const Manifest& l, const Manifest& r) {
         return l.title < r.title;
+    });
+
+    Channel<Manifest> manifestChanged = provider()->manifestChanged();
+    manifestChanged.onReceive(this, [this](const Manifest& plugin) {
+        updatePlugin(plugin);
     });
 
     endResetModel();

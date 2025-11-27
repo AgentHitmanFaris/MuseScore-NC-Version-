@@ -37,7 +37,6 @@ void MuseSamplerCheckUpdateScenario::checkAndShowUpdateIfNeed()
         return;
     }
 
-    LOGI() << "Checking for MuseSampler update...";
     m_alreadyChecked = true;
 
     if (service()->incompatibleLocalVersion()) {
@@ -48,7 +47,7 @@ void MuseSamplerCheckUpdateScenario::checkAndShowUpdateIfNeed()
     auto promise = service()->checkForUpdate();
     promise.onResolve(this, [this](const muse::RetVal<bool>& res) {
         if (!res.ret) {
-            LOGE() << "Unable to check for MuseSampler update: " << res.ret.toString();
+            LOGE() << res.ret.toString();
             return;
         }
 

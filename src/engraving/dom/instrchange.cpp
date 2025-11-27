@@ -25,7 +25,6 @@
 #include "translation.h"
 
 #include "../editing/editinstrumentchange.h"
-#include "../editing/transpose.h"
 
 #include "keysig.h"
 #include "measure.h"
@@ -148,7 +147,7 @@ void InstrumentChange::setupInstrument(const Instrument* instrument)
         } else {
             tickEnd = Fraction::fromTicks(i->first);
         }
-        Transpose::transpositionChanged(score(), part, oldKv, tickStart, tickEnd);
+        score()->transpositionChanged(part, oldKv, tickStart, tickEnd);
     }
 
     //: The text of an "instrument change" marking. It is an instruction to the player to switch to another instrument.

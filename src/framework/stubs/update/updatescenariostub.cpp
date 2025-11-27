@@ -30,8 +30,8 @@ bool UpdateScenarioStub::needCheckForUpdate() const
 
 muse::async::Promise<muse::Ret> UpdateScenarioStub::checkForUpdate(bool)
 {
-    return muse::async::Promise<muse::Ret>([](auto /*resolve*/, auto reject) {
-        return reject(int(muse::Ret::Code::UnknownError), "stub");
+    return muse::async::make_promise<Ret>([](auto, auto) {
+        return muse::async::Promise<muse::Ret>::dummy_result();
     });
 }
 
@@ -40,9 +40,7 @@ bool UpdateScenarioStub::hasUpdate() const
     return false;
 }
 
-muse::async::Promise<muse::Ret> UpdateScenarioStub::showUpdate()
+muse::Ret UpdateScenarioStub::showUpdate()
 {
-    return muse::async::Promise<muse::Ret>([](auto /*resolve*/, auto reject) {
-        return reject(int(muse::Ret::Code::UnknownError), "stub");
-    });
+    return muse::make_ok();
 }

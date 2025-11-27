@@ -19,10 +19,10 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#ifndef MU_INSTRUMENTSSCENE_INSTRUMENTSONSCORELISTMODEL_H
+#define MU_INSTRUMENTSSCENE_INSTRUMENTSONSCORELISTMODEL_H
 
-#pragma once
-
-#include "uicomponents/qml/Muse/UiComponents/selectableitemlistmodel.h"
+#include "uicomponents/view/selectableitemlistmodel.h"
 
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
@@ -93,3 +93,5 @@ private:
     int m_currentOrderIndex = 0;
 };
 }
+
+#endif // MU_INSTRUMENTSSCENE_INSTRUMENTSONSCORELISTMODEL_H

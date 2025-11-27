@@ -36,7 +36,6 @@
 #include "engraving/editing/editscoreproperties.h"
 #include "engraving/editing/editstaff.h"
 #include "engraving/editing/editsystemlocks.h"
-#include "engraving/editing/transpose.h"
 
 #include "igetscore.h"
 
@@ -327,7 +326,7 @@ void NotationParts::setPartSharpFlat(const ID& partId, const SharpFlat& sharpFla
     mu::engraving::Interval oldTransposition = part->staff(0)->transpose(DEFAULT_TICK);
 
     part->undoChangeProperty(mu::engraving::Pid::PREFER_SHARP_FLAT, shartFlatInt);
-    Transpose::transpositionChanged(score(), part, oldTransposition);
+    score()->transpositionChanged(part, oldTransposition);
 
     apply();
 

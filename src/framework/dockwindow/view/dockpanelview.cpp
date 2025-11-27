@@ -30,7 +30,7 @@
 #include "log.h"
 
 #include "ui/uitypes.h"
-#include "uicomponents/qml/Muse/UiComponents/abstractmenumodel.h"
+#include "uicomponents/view/abstractmenumodel.h"
 
 using namespace muse;
 using namespace muse::dock;

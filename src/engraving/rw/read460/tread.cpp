@@ -1502,8 +1502,6 @@ bool TRead::readProperties(Fermata* f, XmlReader& xml, ReadContext& ctx)
 
 void TRead::read(Image* img, XmlReader& e, ReadContext& ctx)
 {
-    bool loaded = false;
-
     while (e.readNextStartElement()) {
         const AsciiStringView tag(e.name());
         if (tag == "autoScale") {
@@ -1520,17 +1518,15 @@ void TRead::read(Image* img, XmlReader& e, ReadContext& ctx)
             //    sp if size is spatium
             img->setSizeIsSpatium(e.readBool());
         } else if (tag == "path") {
-            loaded = img->loadFromStore(e.readText().toStdString());
+            img->setStorePath(e.readText());
         } else if (tag == "linkPath") {
-            if (img->configuration()->allowReadingImagesFromOutsideMscz() && !loaded) {
-                loaded = img->loadFromFile(e.readText());
-            } else {
-                e.skipCurrentElement();
-            }
+            img->setLinkPath(e.readText());
         } else if (!TRead::readProperties(img, e, ctx)) {
             e.unknown();
         }
     }
+
+    img->load();
 }
 
 void TRead::read(Tuplet* t, XmlReader& e, ReadContext& ctx)
@@ -3684,6 +3680,8 @@ bool TRead::readProperties(SLine* l, XmlReader& e, ReadContext& ctx)
         TRead::read(ls, e, ctx);
         l->add(ls);
         ls->setVisible(l->visible());
+    } else if (tag == "length") {
+        l->setLen(e.readDouble());
     } else if (TRead::readProperty(l, tag, e, ctx, Pid::DIAGONAL)) {
     } else if (TRead::readProperty(l, tag, e, ctx, Pid::ANCHOR)) {
     } else if (TRead::readProperty(l, tag, e, ctx, Pid::LINE_WIDTH)) {
@@ -4033,7 +4031,6 @@ void TRead::read(StaffName* item, XmlReader& xml)
 {
     item->setPos(xml.intAttribute("pos", 0));
     String name = xml.readXml();
-    lineBreakFromTag(name);
     if (name.startsWith(u"<html>")) {
         // compatibility to old html implementation:
         name = HtmlParser::parse(name);

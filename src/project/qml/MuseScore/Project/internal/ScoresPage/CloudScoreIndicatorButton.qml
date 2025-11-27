@@ -22,7 +22,7 @@
 import QtQuick
 import QtQuick.Effects
 
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import Muse.Ui 1.0
 
 Item {

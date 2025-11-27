@@ -22,7 +22,9 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
+
+import "Utils.js" as Utils
 
 Rectangle {
     id: root
@@ -78,7 +80,7 @@ Rectangle {
     StyledIconLabel {
         anchors.fill: parent
         iconCode: IconCode.QUESTION_MARK
-        visible: root.isIndeterminate
+        visible: isIndeterminate
     }
 
     MouseArea {
@@ -89,7 +91,7 @@ Rectangle {
         hoverEnabled: true
 
         onClicked: {
-            navCtrl.requestActiveByInteraction()
+            navigation.requestActiveByInteraction()
 
             prv.selectColor()
         }

@@ -19,13 +19,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-#pragma once
+#ifndef MU_NOTATION_NOTATIONCONTEXTMENUMODEL_H
+#define MU_NOTATION_NOTATIONCONTEXTMENUMODEL_H
 
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
 
-#include "uicomponents/qml/Muse/UiComponents/abstractmenumodel.h"
+#include "uicomponents/view/abstractmenumodel.h"
 #include "notation/notationtypes.h"
 
 namespace mu::notation {
@@ -77,3 +77,5 @@ private:
     const INotationInteraction::HitElementContext& hitElementContext() const;
 };
 }
+
+#endif // MU_NOTATION_NOTATIONCONTEXTMENUMODEL_H

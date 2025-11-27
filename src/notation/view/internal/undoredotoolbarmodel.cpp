@@ -22,7 +22,7 @@
 
 #include "undoredotoolbarmodel.h"
 
-#include "uicomponents/qml/Muse/UiComponents/toolbaritem.h"
+#include "uicomponents/view/toolbaritem.h"
 
 using namespace mu::notation;
 using namespace muse;

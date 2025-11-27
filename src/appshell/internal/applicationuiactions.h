@@ -19,15 +19,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-#pragma once
+#ifndef MU_APPSHELL_APPLICATIONUIACTIONS_H
+#define MU_APPSHELL_APPLICATIONUIACTIONS_H
 
 #include "ui/iuiactionsmodule.h"
 #include "applicationactioncontroller.h"
 #include "modularity/ioc.h"
+#include "context/iuicontextresolver.h"
 #include "async/asyncable.h"
 #include "ui/imainwindow.h"
-#include "braille/ibrailleconfiguration.h"
+#include "view/preferences/braillepreferencesmodel.h"
 #include "notation/inotationconfiguration.h"
 
 #include "dockwindow/idockwindowprovider.h"
@@ -66,3 +67,5 @@ private:
     muse::async::Channel<muse::actions::ActionCodeList> m_actionCheckedChanged;
 };
 }
+
+#endif // MU_APPSHELL_APPLICATIONUIACTIONS_H

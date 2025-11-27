@@ -60,7 +60,6 @@
 #include "engraving/dom/tuplet.h"
 #include "engraving/dom/utils.h"
 #include "engraving/dom/volta.h"
-#include "engraving/editing/transpose.h"
 
 #include "engraving/engravingerrors.h"
 #include "engraving/infrastructure/messagebox.h"
@@ -881,7 +880,7 @@ static Fraction readCapVoice(Score* score, CapVoice* cvoice, int staffIdx, const
             Key cKey = tKey;
             Interval v = score->staff(staffIdx)->part()->instrument(tick)->transpose();
             if (!v.isZero() && !score->style().styleB(mu::engraving::Sid::concertPitch)) {
-                cKey = Transpose::transposeKey(tKey, v);
+                cKey = transposeKey(tKey, v);
                 // if there are more than 6 accidentals in transposing key, it cannot be PreferSharpFlat::AUTO
                 Part* part = score->staff(staffIdx)->part();
                 if ((tKey > 6 || tKey < -6) && part->preferSharpFlat() == PreferSharpFlat::AUTO) {

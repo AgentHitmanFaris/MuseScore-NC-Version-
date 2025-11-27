@@ -24,8 +24,6 @@
 #include <QQmlEngine>
 #include <QQmlContext>
 
-#include "log.h"
-
 using namespace muse::extensions;
 namespace muse::extensions {
 class QmlApiEngine : public muse::api::IApiEngine
@@ -81,25 +79,8 @@ void ExtensionsUiEngine::setup()
     m_engine->rootContext()->setContextProperty("ui", ui);
 
     m_apiEngine = new QmlApiEngine(m_engine, iocContext());
-    QJSValue globalObject = m_engine->globalObject();
     m_api = new api::ExtApi(m_apiEngine, m_engine);
-    globalObject.setProperty("api", m_engine->newQObject(m_api));
-
-    QJSValue freezeFn = m_engine->evaluate("Object.freeze");
-
-    const std::vector<muse::api::IApiRegister::GlobalEnum>& globalEnums = apiRegister()->globalEnums();
-    for (const muse::api::IApiRegister::GlobalEnum& e : globalEnums) {
-        QJSValue enumObj = m_engine->newObject();
-        QString name = QString::fromLatin1(e.meta.enumName());
-
-        for (int i = 0; i < e.meta.keyCount(); ++i) {
-            QString key = QString::fromLatin1(e.meta.key(i));
-            enumObj.setProperty(key, key);
-        }
-
-        QJSValue frozenObj = freezeFn.call({ enumObj });
-        globalObject.setProperty(name, frozenObj);
-    }
+    m_engine->globalObject().setProperty("api", m_engine->newQObject(m_api));
 
     //! NOTE We prohibit importing default modules;
     //! only what is in the `api` folder will be imported.

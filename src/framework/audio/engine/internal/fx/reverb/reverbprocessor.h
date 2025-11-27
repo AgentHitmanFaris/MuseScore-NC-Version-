@@ -47,7 +47,7 @@ public:
     bool active() const override;
     void setActive(bool active) override;
 
-    void process(float* buffer, unsigned int sampleCount, muse::audio::msecs_t playbackPosition = 0) override;
+    void process(float* buffer, unsigned int sampleCount) override;
 
 private:
     enum Params

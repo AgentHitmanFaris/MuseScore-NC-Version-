@@ -18,7 +18,7 @@
 # You should have received a copy of the GNU General Public License
 # along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
-cmake_minimum_required(VERSION 3.22) # Min. required by Qt 6.10
+cmake_minimum_required(VERSION 3.22) # Min. required by Qt 6.9
 
 project(MuseScore LANGUAGES C CXX)
 
@@ -93,7 +93,6 @@ option(MUE_BUILD_NOTATION_TESTS "Build notation tests" ON)
 option(MUE_BUILD_PALETTE_MODULE "Build palette module" ON)
 option(MUE_BUILD_PLAYBACK_MODULE "Build playback module" ON)
 option(MUE_BUILD_PLAYBACK_TESTS "Build playback tests" ON)
-option(MUE_BUILD_PREFERENCES_MODULE "Build preferences module" ON)
 option(MUE_BUILD_PRINT_MODULE "Build print module" ON)
 option(MUE_BUILD_PROJECT_MODULE "Build project module" ON)
 option(MUE_BUILD_PROJECT_TESTS "Build project tests" ON)

@@ -19,7 +19,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#ifndef MU_NOTATION_ABSTRACTNOTATIONPAINTVIEW_H
+#define MU_NOTATION_ABSTRACTNOTATIONPAINTVIEW_H
 
 #include <QTimer>
 
@@ -27,15 +28,16 @@
 
 #include "notation/inotationconfiguration.h"
 
-#include "actions/actionable.h"
 #include "actions/iactionsdispatcher.h"
-#include "async/asyncable.h"
+#include "ui/iuiconfiguration.h"
+#include "actions/actionable.h"
 #include "context/iglobalcontext.h"
+#include "async/asyncable.h"
 #include "playback/iplaybackcontroller.h"
+#include "ui/iuicontextresolver.h"
 #include "ui/imainwindow.h"
 #include "ui/iuiactionsregister.h"
-#include "ui/iuiconfiguration.h"
-#include "ui/iuicontextresolver.h"
+#include "uicomponents/view/abstractmenumodel.h"
 #include "uicomponents/view/quickpaintedview.h"
 
 #include "notationviewinputcontroller.h"
@@ -298,3 +300,5 @@ private:
     QQuickItem* m_playbackCursorItem = nullptr;
 };
 }
+
+#endif // MU_NOTATION_ABSTRACTNOTATIONPAINTVIEW_H

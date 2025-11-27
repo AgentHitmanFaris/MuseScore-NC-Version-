@@ -142,8 +142,6 @@ void EngineController::deinit()
     m_playback->deinit();
     m_rpcController->deinit();
     m_audioEngine->deinit();
-    m_playback.reset();
-    m_rpcController.reset();
 }
 
 OutputSpec EngineController::outputSpec() const

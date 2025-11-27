@@ -410,8 +410,8 @@ bool Palette::readFromFile(const QString& p)
 
     XmlReader e(ba);
     // extract first rootfile
-    QString rootfile;
-    std::vector<std::string> images;
+    QString rootfile = "";
+    QList<QString> images;
     while (e.readNextStartElement()) {
         if (e.name() != "container") {
             e.unknown();
@@ -431,7 +431,7 @@ bool Palette::readFromFile(const QString& p)
                     }
                     e.readNext();
                 } else if (tag == "file") {
-                    images.push_back(e.readAsciiText().ascii());
+                    images.append(e.readText());
                 } else {
                     e.unknown();
                 }
@@ -441,8 +441,8 @@ bool Palette::readFromFile(const QString& p)
     //
     // load images
     //
-    for (const std::string& s : images) {
-        imageStore.add(s, f.fileData(s));
+    for (const QString& s : images) {
+        imageStore.add(s, f.fileData(s.toStdString()));
     }
 
     if (rootfile.isEmpty()) {
@@ -475,12 +475,13 @@ bool Palette::readFromFile(const QString& p)
 
 bool Palette::writeToFile(const QString& p) const
 {
-    std::set<ImageStoreItem*> images;
-    for (const PaletteCellPtr& cell : m_cells) {
-        if (!cell || !cell->element || !cell->element->isImage()) {
+    QSet<ImageStoreItem*> images;
+    size_t n = m_cells.size();
+    for (size_t i = 0; i < n; ++i) {
+        if (m_cells[i] == 0 || m_cells[i]->element == 0 || m_cells[i]->element->type() != ElementType::IMAGE) {
             continue;
         }
-        images.insert(toImage(cell->element.get())->storeItem());
+        images.insert(toImage(m_cells[i]->element.get())->storeItem());
     }
 
     QString path(p);
@@ -502,22 +503,21 @@ bool Palette::writeToFile(const QString& p) const
     xml.startElement("rootfiles");
     xml.startElement("rootfile", { { "full-path", "palette.xml" } });
     xml.endElement();
-    for (const ImageStoreItem* ip : images) {
-        std::string ipath = "Pictures/" + ip->hashName();
+    foreach (ImageStoreItem* ip, images) {
+        QString ipath = QString("Pictures/") + ip->hashName().toQString();
         xml.tag("file", ipath);
     }
     xml.endElement();
     xml.endElement();
-    xml.flush();
     cbuf.seek(0);
     //f.addDirectory("META-INF");
     //f.addDirectory("Pictures");
     f.addFile("META-INF/container.xml", cbuf.data());
 
     // save images
-    for (const ImageStoreItem* ip : images) {
-        std::string ipath = "Pictures/" + ip->hashName();
-        f.addFile(ipath, ip->buffer());
+    for (ImageStoreItem* ip : images) {
+        QString ipath = QString("Pictures/") + ip->hashName().toQString();
+        f.addFile(ipath.toStdString(), ip->buffer());
     }
     {
         Buffer cbuf1;
@@ -527,7 +527,6 @@ bool Palette::writeToFile(const QString& p) const
         xml1.startElement("museScore", { { "version", Constants::MSC_VERSION_STR } });
         write(xml1, false);
         xml1.endElement();
-        xml1.flush();
         cbuf1.close();
         f.addFile("palette.xml", cbuf1.data());
     }

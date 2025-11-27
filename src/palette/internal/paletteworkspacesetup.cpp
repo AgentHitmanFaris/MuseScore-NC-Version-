@@ -65,7 +65,6 @@ static void writePalette(const PaletteTreePtr& tree, QByteArray& data)
     buf.open(IODevice::WriteOnly);
     mu::engraving::XmlWriter writer(&buf);
     tree->write(writer, false);
-    writer.flush();
     data = buf.data().toQByteArray();
 }
 

@@ -38,7 +38,6 @@
 #include "cursor.h"
 #include "elements.h"
 #include "selection.h"
-#include "util.h"
 
 #include "log.h"
 
@@ -200,9 +199,6 @@ void PluginAPI::registerQmlTypes()
     qRegisterMetaType<IntervalWrapper*>("IntervalWrapper*");
     qmlRegisterAnonymousType<OrnamentIntervalWrapper>("MuseScore", 3);
     qRegisterMetaType<OrnamentIntervalWrapper*>("OrnamentIntervalWrapper*");
-
-    qmlRegisterType<MsProcess>("MuseScore", 3, 0, "QProcess");
-    qmlRegisterType<FileIO, 1>("FileIO",    3, 0, "FileIO");
 
     qmlTypesRegistered = true;
 }

@@ -301,13 +301,13 @@ inline void unpack_custom(muse::msgpack::UnPacker& p, muse::audio::InputProcessi
 
 inline void pack_custom(muse::msgpack::Packer& p, const muse::audio::InputProcessingProgress::StatusInfo& value)
 {
-    p.process(static_cast<uint8_t>(value.status), value.errorCode, value.errorText, value.data);
+    p.process(static_cast<uint8_t>(value.status), value.errorCode, value.errorText);
 }
 
 inline void unpack_custom(muse::msgpack::UnPacker& p, muse::audio::InputProcessingProgress::StatusInfo& value)
 {
     uint8_t status = 0;
-    p.process(status, value.errorCode, value.errorText, value.data);
+    p.process(status, value.errorCode, value.errorText);
     value.status = static_cast<muse::audio::InputProcessingProgress::Status>(status);
 }
 

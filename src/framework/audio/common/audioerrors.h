@@ -65,7 +65,6 @@ enum class Err {
 
     // online sounds
     OnlineSoundsProcessingError = 361,
-    OnlineSoundsLimitReached = 362,
 };
 
 inline Ret make_ret(Err e)

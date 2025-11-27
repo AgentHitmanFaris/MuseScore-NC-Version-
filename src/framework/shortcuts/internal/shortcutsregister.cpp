@@ -368,9 +368,8 @@ bool ShortcutsRegister::writeToFile(const ShortcutList& shortcuts, const io::pat
     }
 
     writer.endElement();
-    writer.flush();
 
-    return !file.hasError();
+    return file.hasError();
 }
 
 void ShortcutsRegister::writeShortcut(XmlStreamWriter& writer, const Shortcut& shortcut) const

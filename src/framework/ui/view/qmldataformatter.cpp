@@ -32,25 +32,5 @@ QmlDataFormatter::QmlDataFormatter(QObject* parent)
 
 QString QmlDataFormatter::formatReal(double value, int decimals) const
 {
-    QLocale locale;
-    QString formatted = locale.toString(value, 'f', decimals);
-    if (decimals > 0) {
-        // Remove trailing zeros after the decimal separator
-        QString decSepStr = locale.decimalPoint();
-        QChar decSep = decSepStr.isEmpty() ? QChar('.') : decSepStr.at(0);
-        int decPos = formatted.indexOf(decSep);
-        if (decPos != -1) {
-            int last = formatted.length() - 1;
-            // Remove trailing zeros
-            while (last > decPos && formatted[last] == '0') {
-                --last;
-            }
-            // Remove trailing decimal separator if needed
-            if (last == decPos) {
-                --last;
-            }
-            formatted = formatted.left(last + 1);
-        }
-    }
-    return formatted;
+    return DataFormatter::formatReal(value, decimals);
 }

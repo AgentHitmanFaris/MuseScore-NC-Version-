@@ -22,7 +22,7 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 import "../../common"
 import "internal"
@@ -71,7 +71,6 @@ Column {
         offset: root.model?.offset ?? null
         isSnappedToGrid: root.model?.isSnappedToGrid ?? false
         isVerticalOffsetAvailable: root.model?.isVerticalOffsetAvailable ?? false
-        measurementUnits: root.model?.measurementUnits ?? CommonTypes.UNITS_UNKNOWN
 
         navigationPanel: root.navigationPanel
         navigationRowStart: verticalSpacingSection.navigationRowEnd + 1

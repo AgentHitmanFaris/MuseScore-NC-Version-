@@ -19,13 +19,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-pragma ComponentBehavior: Bound
+import QtQuick 2.15
+import QtQuick.Layouts 1.15
 
-import QtQuick
-import QtQuick.Layouts
-
-import Muse.Ui 
-import Muse.UiComponents
+import Muse.Ui 1.0
+import Muse.UiComponents 1.0
 
 FocusScope {
     id: root
@@ -196,8 +194,8 @@ FocusScope {
         anchors.verticalCenter: parent ? parent.verticalCenter : undefined
         anchors.horizontalCenter: parent ? parent.horizontalCenter : undefined
 
-        readonly property real itemImplicitWidth: (item as Item)?.implicitWidth ?? 0
-        readonly property real itemImplicitHeight: (item as Item)?.implicitHeight ?? 0
+        readonly property real itemImplicitWidth: item ? item.implicitWidth : 0
+        readonly property real itemImplicitHeight: item ? item.implicitHeight : 0
 
         sourceComponent: root.contentItem ? root.contentItem : defaultContentComponent
         readonly property Component defaultContentComponent: root.isVertical ? verticalContentComponent : horizontalContentComponent
@@ -215,7 +213,7 @@ FocusScope {
                 iconCode: root.icon
                 font: root.iconFont
                 color: root.iconColor
-                visible: !isEmpty && root.buttonType != FlatButton.TextOnly
+                visible: !isEmpty && buttonType != FlatButton.TextOnly
             }
 
             StyledTextLabel {
@@ -226,7 +224,7 @@ FocusScope {
                 textFormat: root.textFormat
                 wrapMode: Text.Wrap
                 maximumLineCount: root.maximumLineCount
-                visible: !isEmpty && root.buttonType != FlatButton.IconOnly
+                visible: !isEmpty && buttonType != FlatButton.IconOnly
             }
         }
     }
@@ -313,8 +311,8 @@ FocusScope {
         hoverEnabled: true
 
         onClicked: function(mouse) {
-            root.navigation.requestActiveByInteraction()
-            root.navigation.notifyAboutControlWasTriggered()
+            navigation.requestActiveByInteraction()
+            navigation.notifyAboutControlWasTriggered()
 
             root.doClicked(mouse)
         }

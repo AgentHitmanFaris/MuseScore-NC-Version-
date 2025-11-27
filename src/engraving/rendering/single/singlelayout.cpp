@@ -24,7 +24,6 @@
 
 #include "draw/fontmetrics.h"
 
-#include "types/types.h"
 #include "types/typesconv.h"
 #include "types/symnames.h"
 
@@ -494,15 +493,14 @@ void SingleLayout::layout(Articulation* item, const Context& ctx)
         text->setXmlText(TConv::text(item->textType()));
         text->setTrack(item->track());
         text->setParent(item);
+        text->setAlign(Align(AlignH::HCENTER, AlignV::VCENTER));
 
         layoutTextBase(item->text(), ctx, item->text()->mutldata());
-        bbox = text->ldata()->bbox();
     } else {
         bbox = item->symBbox(item->symId());
-        bbox.translate(-0.5 * bbox.width(), 0.0);
     }
 
-    item->setbbox(bbox);
+    item->setbbox(bbox.translated(-0.5 * bbox.width(), 0.0));
 }
 
 void SingleLayout::layout(BagpipeEmbellishment* item, const Context& ctx)
@@ -1056,7 +1054,6 @@ void SingleLayout::layout(HammerOnPullOffSegment* item, const Context& ctx)
     align.vertical = AlignV::BASELINE;
     align.horizontal = AlignH::HCENTER;
     hopoText->setAlign(align);
-    hopoText->setPosition(AlignH::HCENTER);
     layoutTextBase(hopoText, ctx, hopoText->mutldata());
 
     RectF bbox = item->ldata()->bbox();
@@ -1415,7 +1412,28 @@ void SingleLayout::layout(MeasureRepeat* item, const Context& ctx)
 
 void SingleLayout::layout(Ornament* item, const Context& ctx)
 {
-    layout(toArticulation(item), ctx);
+    double spatium = item->spatium();
+    double vertMargin = 0.35 * spatium;
+    constexpr double ornamentAccidentalMag = 0.6; // TODO: style?
+
+    if (!item->showCueNote()) {
+        for (size_t i = 0; i < item->accidentalsAboveAndBelow().size(); ++i) {
+            bool above = (i == 0);
+            Accidental* accidental = item->accidentalsAboveAndBelow()[i];
+            if (!accidental) {
+                continue;
+            }
+            accidental->computeMag();
+            accidental->mutldata()->setMag(accidental->mag() * ornamentAccidentalMag);
+            layout(accidental, ctx);
+            Shape accidentalShape = accidental->shape();
+            double minVertDist = above
+                                 ? accidentalShape.minVerticalDistance(item->ldata()->bbox())
+                                 : Shape(item->ldata()->bbox()).minVerticalDistance(accidentalShape);
+            accidental->setPos(-0.5 * accidental->width(), above ? (-minVertDist - vertMargin) : (minVertDist + vertMargin));
+        }
+        return;
+    }
 }
 
 void SingleLayout::layout(Ottava* item, const Context& ctx)
@@ -1896,16 +1914,7 @@ void SingleLayout::layout(VoltaSegment* item, const Context& ctx)
 {
     layoutTextLineBaseSegment(item, ctx);
     item->setOffset(PointF());
-
-    double spatium = ctx.style().spatium();
-    double hookHeight = item->volta()->beginHookHeight().toMM(spatium);
-    if (item->text()) {
-        Text* text = item->text();
-        text->setParent(item);
-        RectF textBBox = text->ldata()->bbox().translated(text->pos());
-        text->mutldata()->moveY(hookHeight - textBBox.bottom());
-        text->mutldata()->moveX(0.5 * spatium);
-    }
+    item->text()->setOffset(PointF(10.0, 54.0)); //! TODO
 }
 
 void SingleLayout::layout(Text* item, const Context& ctx)
@@ -2024,7 +2033,7 @@ void SingleLayout::layout1TextBase(const TextBase* item, const Context&, TextBas
 void SingleLayout::layoutLine(SLine* item, const Context& ctx)
 {
     if (item->spannerSegments().empty()) {
-        item->setLen(ctx.style().spatium() * 8);
+        item->setLen(ctx.style().spatium() * 7);
     }
 
     LineSegment* lineSegm = item->frontSegment();

@@ -20,7 +20,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#pragma once
+#ifndef MUSE_SHORTCUTS_SHORTCUTSMODEL_H
+#define MUSE_SHORTCUTS_SHORTCUTSMODEL_H
 
 #include <QAbstractListModel>
 #include <QItemSelection>
@@ -99,3 +100,5 @@ private:
     QItemSelection m_selection;
 };
 }
+
+#endif // MUSE_SHORTCUTS_SHORTCUTSMODEL_H

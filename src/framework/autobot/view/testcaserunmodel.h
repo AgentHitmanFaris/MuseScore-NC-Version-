@@ -19,12 +19,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-#pragma once
+#ifndef MUSE_AUTOBOT_TESTCASERUNMODEL_H
+#define MUSE_AUTOBOT_TESTCASERUNMODEL_H
 
 #include <QObject>
 #include <QVariant>
 
 #include "modularity/ioc.h"
+#include "internal/scriptengine.h"
 #include "autobottypes.h"
 #include "../iautobot.h"
 #include "async/asyncable.h"
@@ -75,3 +77,5 @@ private:
     QList<StepItem> m_steps;
 };
 }
+
+#endif // MUSE_AUTOBOT_TESTCASERUNMODEL_H

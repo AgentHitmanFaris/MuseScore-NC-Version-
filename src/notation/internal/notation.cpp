@@ -88,6 +88,10 @@ Notation::Notation(IMasterNotation* master, const muse::modularity::ContextPtr& 
         notifyAboutNotationChanged();
     });
 
+    engravingConfiguration()->selectionColorChanged().onReceive(this, [this](int, const muse::draw::Color&) {
+        notifyAboutNotationChanged();
+    });
+
     configuration()->canvasOrientation().ch.onReceive(this, [this](muse::Orientation) {
         if (m_score && m_score->autoLayoutEnabled()) {
             m_score->doLayout();

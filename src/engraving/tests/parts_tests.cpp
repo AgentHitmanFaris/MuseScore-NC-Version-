@@ -22,8 +22,6 @@
 
 #include <gtest/gtest.h>
 
-#include "io/fileinfo.h"
-
 #include "engraving/dom/breath.h"
 #include "engraving/dom/chord.h"
 #include "engraving/dom/chordline.h"
@@ -167,21 +165,9 @@ void Engraving_PartsTests::testPartCreation(const String& test)
 {
     MasterScore* score = ScoreRW::readScore(PARTS_DATA_DIR + test + u".mscx");
     ASSERT_TRUE(score);
-
-    if (muse::io::FileInfo(ScoreRW::rootPath() + u"/" + PARTS_DATA_DIR + test + u"-ref.mscx").exists()) {
-        EXPECT_TRUE(ScoreComp::saveCompareScore(score, test + u"-1.mscx", PARTS_DATA_DIR + test + u"-ref.mscx"));
-    } else {
-        EXPECT_TRUE(ScoreComp::saveCompareScore(score, test + u"-1.mscx", PARTS_DATA_DIR + test + u".mscx"));
-    }
-
+    EXPECT_TRUE(ScoreComp::saveCompareScore(score, test + u"-1.mscx", PARTS_DATA_DIR + test + u".mscx"));
     TestUtils::createParts(score, 2);
-
-    if (muse::io::FileInfo(ScoreRW::rootPath() + u"/" + PARTS_DATA_DIR + test + u"-parts-ref.mscx").exists()) {
-        EXPECT_TRUE(ScoreComp::saveCompareScore(score, test + u"-parts.mscx", PARTS_DATA_DIR + test + u"-parts-ref.mscx"));
-    } else {
-        EXPECT_TRUE(ScoreComp::saveCompareScore(score, test + u"-parts.mscx", PARTS_DATA_DIR + test + u"-parts.mscx"));
-    }
-
+    EXPECT_TRUE(ScoreComp::saveCompareScore(score, test + u"-parts.mscx", PARTS_DATA_DIR + test + u"-parts.mscx"));
     delete score;
 }
 
@@ -307,30 +293,6 @@ TEST_F(Engraving_PartsTests, styleScoreDefault)
 TEST_F(Engraving_PartsTests, createPart1)
 {
     testPartCreation(u"part-empty");
-}
-
-TEST_F(Engraving_PartsTests, createEmptyPart)
-{
-    String sourceFileName = u"part-empty";
-    MasterScore* score = ScoreRW::readScore(PARTS_DATA_DIR + sourceFileName + u".mscx");
-    ASSERT_TRUE(score);
-    EXPECT_TRUE(ScoreComp::saveCompareScore(score, sourceFileName + u"-1.mscx", PARTS_DATA_DIR + sourceFileName + u".mscx"));
-
-    TestUtils::createEmptyPart(score);
-
-    // Check that measures have correct ticks set
-    for (Excerpt* excerpt : score->excerpts()) {
-        Score* excerptScore = excerpt->excerptScore();
-        EXPECT_TRUE(excerptScore);
-        for (MeasureBase* mb = excerptScore->first(); mb; mb = mb->next()) {
-            if (mb->isMeasure()) {
-                EXPECT_GT(mb->ticks(), Fraction(0, 1));
-            }
-            if (mb->prev()) {
-                EXPECT_EQ(mb->prev()->endTick(), mb->tick());
-            }
-        }
-    }
 }
 
 TEST_F(Engraving_PartsTests, createPart2)
@@ -1027,7 +989,7 @@ MasterScore* Engraving_PartsTests::doAddImage()
     Note* note   = chord->upNote();
     EditData dd(0);
     Image* b = Factory::createImage(note);
-    b->loadFromFile(PARTS_DATA_DIR + u"schnee.png");
+    b->load(PARTS_DATA_DIR + u"schnee.png");
     dd.dropElement = b;
 
     score->startCmd(TranslatableString::untranslatable("Engraving parts tests"));

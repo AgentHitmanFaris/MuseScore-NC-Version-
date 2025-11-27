@@ -23,6 +23,7 @@
 #include "soundprofilesmodel.h"
 
 #include "project/inotationproject.h"
+#include "project/iprojectaudiosettings.h"
 
 using namespace mu::playback;
 using namespace mu::project;

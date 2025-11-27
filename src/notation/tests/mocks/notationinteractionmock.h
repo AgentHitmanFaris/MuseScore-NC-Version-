@@ -132,8 +132,7 @@ public:
     MOCK_METHOD(void, startEditGrip, (EngravingItem*, mu::engraving::Grip), (override));
     MOCK_METHOD(void, endEditGrip, (), (override));
 
-    MOCK_METHOD(bool, isEditingElement, (), (const, override));
-    MOCK_METHOD(muse::async::Notification, isEditingElementChanged, (), (const, override));
+    MOCK_METHOD(bool, isElementEditStarted, (), (const, override));
     MOCK_METHOD(void, startEditElement, (EngravingItem*), (override));
     MOCK_METHOD(void, changeEditElement, (EngravingItem*), (override));
     MOCK_METHOD(bool, isEditAllowed, (QKeyEvent*), (override));
@@ -151,7 +150,7 @@ public:
     MOCK_METHOD(void, addBoxes, (BoxType, int, int, bool), (override));
 
     MOCK_METHOD(void, copySelection, (), (override));
-    MOCK_METHOD(void, repeatSelection, (), (override));
+    MOCK_METHOD(muse::Ret, repeatSelection, (), (override));
     MOCK_METHOD(void, copyLyrics, (), (override));
     MOCK_METHOD(void, pasteSelection, (const Fraction&), (override));
     MOCK_METHOD(void, swapSelection, (), (override));
@@ -229,8 +228,6 @@ public:
 
     MOCK_METHOD(void, changeEnharmonicSpelling, (bool), (override));
     MOCK_METHOD(void, spellPitches, (), (override));
-    MOCK_METHOD(void, spellPitchesWithSharps, (), (override));
-    MOCK_METHOD(void, spellPitchesWithFlats, (), (override));
     MOCK_METHOD(void, regroupNotesAndRests, (), (override));
     MOCK_METHOD(void, resequenceRehearsalMarks, (), (override));
 
@@ -290,7 +287,6 @@ public:
     MOCK_METHOD(muse::async::Channel<ShowItemRequest>, showItemRequested, (), (const, override));
 
     MOCK_METHOD(void, setGetViewRectFunc, (const std::function<muse::RectF()>&), (override));
-    MOCK_METHOD(void, checkAndShowError, (), (override));
     MOCK_METHOD(void, toggleDebugShowGapRests, (), (override));
 };
 }

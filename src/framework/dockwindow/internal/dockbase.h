@@ -19,16 +19,16 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-
-#pragma once
+#ifndef MUSE_DOCK_DOCKBASE_H
+#define MUSE_DOCK_DOCKBASE_H
 
 #include <QQuickItem>
 
 #include <optional>
 
 #include "../docktypes.h"
+#include "uicomponents/view/qmllistproperty.h"
 #include "ui/view/navigationsection.h"
-#include "uicomponents/qml/Muse/UiComponents/qmllistproperty.h"
 
 namespace KDDockWidgets {
 class DockWidgetQuick;
@@ -240,3 +240,5 @@ struct DropDestination
     void clear();
 };
 }
+
+#endif // MUSE_DOCK_DOCKBASE_H

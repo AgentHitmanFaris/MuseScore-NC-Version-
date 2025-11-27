@@ -1,5 +1,5 @@
 
-muse_create_thirdparty_module(asiosdk)
+declare_thirdparty_module(asiosdk)
 
 if(MUSE_MODULE_AUDIO_ASIO_SDK_PATH)
     set(ASIO_SDK_PATH ${MUSE_MODULE_AUDIO_ASIO_SDK_PATH})
@@ -28,18 +28,22 @@ else()
 
 endif()
 
-target_sources(asiosdk PRIVATE
+set(MODULE_SRC
     ${CMAKE_CURRENT_LIST_DIR}/asiosdk_asio.cpp
     ${CMAKE_CURRENT_LIST_DIR}/asiosdk_asiolist.cpp
     ${CMAKE_CURRENT_LIST_DIR}/asiosdk_asiodrivers.cpp
-)
+    )
 
-target_include_directories(asiosdk PUBLIC
+set(MODULE_INCLUDE
     ${ASIO_SDK_PATH}
     ${ASIO_SDK_PATH}/ASIOSDK/common
     ${ASIO_SDK_PATH}/ASIOSDK/host
     ${ASIO_SDK_PATH}/ASIOSDK/host/pc
-)
+    )
+
+set(MODULE_USE_UNITY OFF)
+
+setup_module()
 
 # Silence warnings from SDK
 target_compile_options(asiosdk PRIVATE /wd4267)

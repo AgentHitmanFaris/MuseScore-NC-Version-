@@ -24,9 +24,11 @@
 #include "async/asyncable.h"
 #include "modularity/ioc.h"
 
+#include "engraving/iengravingconfiguration.h"
+
 #include "../inotation.h"
-#include "../inotationconfiguration.h"
 #include "igetscore.h"
+#include "../inotationconfiguration.h"
 
 namespace mu::engraving {
 class Score;
@@ -38,6 +40,7 @@ class NotationPlayback;
 class Notation : virtual public INotation, public IGetScore, public muse::Injectable, public muse::async::Asyncable
 {
     muse::Inject<INotationConfiguration> configuration = { this };
+    muse::Inject<engraving::IEngravingConfiguration> engravingConfiguration = { this };
 
 public:
     explicit Notation(IMasterNotation* master, const muse::modularity::ContextPtr& iocCtx, engraving::Score* score = nullptr);

@@ -51,7 +51,7 @@ jobs:
       with:
         access_token: ${{ github.token }}
     - name: Clone repository
-      uses: actions/checkout@v6
+      uses: actions/checkout@v5
 
     - name: "Configure workflow"
       run: |
@@ -137,11 +137,10 @@ jobs:
       run: |
         bash ./buildscripts/ci/backend/publish_to_registry.sh --token ${{ secrets.PACKAGES_PAT }}
 
-    - name: Check and update config on S3
+    - name: Deploy to musescore.com
       if: env.DO_DEPLOY == 'true'
       run: |
-        bash ./buildscripts/ci/backend/check_update_config_on_s3.sh \
-          --token ${{ secrets.PACKAGES_PAT }} \
+        bash ./buildscripts/ci/backend/update_config_on_s3.sh \
           --s3_key ${{ secrets.S3_KEY_CONVERTER }} \
           --s3_secret ${{ secrets.S3_SECRET_CONVERTER }} \
           --stage ${{ inputs.build_mode }} \

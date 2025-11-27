@@ -44,8 +44,6 @@
 #include "types/commontypes.h"
 
 namespace mu::inspector {
-using MeasurementUnits = CommonTypes::MeasurementUnits;
-
 class AbstractInspectorModel : public QObject, public muse::async::Asyncable
 {
     Q_OBJECT
@@ -57,7 +55,6 @@ class AbstractInspectorModel : public QObject, public muse::async::Asyncable
     Q_PROPERTY(bool isEmpty READ isEmpty NOTIFY isEmptyChanged)
 
     Q_PROPERTY(bool isSystemObjectBelowBottomStaff READ isSystemObjectBelowBottomStaff NOTIFY isSystemObjectBelowBottomStaffChanged)
-    Q_PROPERTY(MeasurementUnits measurementUnits READ measurementUnits NOTIFY measurementUnitsChanged)
 
 public:
     muse::Inject<context::IGlobalContext> context;
@@ -186,8 +183,6 @@ public:
                                    const mu::engraving::StyleIdSet& changedStyleIdSet);
 
     bool isSystemObjectBelowBottomStaff() const;
-    MeasurementUnits measurementUnits() const;
-
     bool shouldUpdateOnScoreChange() const;
     virtual bool shouldUpdateOnEmptyPropertyAndStyleIdSets() const;
 
@@ -210,7 +205,6 @@ signals:
     void requestReloadInspectorListModel();
 
     void isSystemObjectBelowBottomStaffChanged(bool isSystemObjectBelowBottomStaff);
-    void measurementUnitsChanged(MeasurementUnits measurementUnits);
 
 protected:
     void setElementType(mu::engraving::ElementType type);
@@ -265,7 +259,6 @@ protected slots:
     void resetPropertyValue(const QList<mu::engraving::EngravingItem*>& items, const mu::engraving::Pid pid);
     void updateProperties();
     void updateIsSystemObjectBelowBottomStaff();
-    void updatemeasurementUnits();
 
 private:
     static bool showPartsSection(const QList<mu::engraving::EngravingItem*>& selectedElementList);
@@ -288,7 +281,6 @@ private:
     bool m_shouldUpdateOnScoreChange = true;
 
     bool m_isSystemObjectBelowBottomStaff = false;
-    MeasurementUnits m_measurementUnits = MeasurementUnits::UNITS_UNKNOWN;
 };
 
 using InspectorModelType = AbstractInspectorModel::InspectorModelType;

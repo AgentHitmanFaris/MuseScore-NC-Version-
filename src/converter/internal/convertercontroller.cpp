@@ -30,7 +30,6 @@
 #include "global/io/file.h"
 #include "global/io/dir.h"
 
-#include "engraving/dom/masterscore.h"
 #include "engraving/infrastructure/mscio.h"
 
 #include "convertercodes.h"
@@ -128,7 +127,7 @@ Ret ConverterController::fileConvert(const muse::io::path_t& in, const muse::io:
                                      const muse::UriQuery& extensionUri,
                                      const std::optional<notation::TransposeOptions>& transposeOptions,
                                      const std::optional<size_t>& pageNum, const std::vector<size_t>& visibleParts,
-                                     const CopyrightInfo& copyright)
+                                     const muse::String& copyright)
 {
     TRACEFUNC;
 
@@ -169,13 +168,9 @@ Ret ConverterController::fileConvert(const muse::io::path_t& in, const muse::io:
         ConverterUtils::setVisibleParts(notationProject->masterNotation()->notation(), visibleParts);
     }
 
-    if (!copyright.text.isEmpty()) {
-        if (copyright.showOnAllPages) {
-            notationProject->masterNotation()->masterScore()->style().set(mu::engraving::Sid::oddFooterC, "$c");
-            notationProject->masterNotation()->masterScore()->style().set(mu::engraving::Sid::evenFooterC, "$c");
-        }
+    if (!copyright.isEmpty()) {
         ProjectMeta meta = notationProject->metaInfo();
-        meta.copyright += copyright.text;
+        meta.copyright += copyright;
         notationProject->setMetaInfo(meta);
     }
 
@@ -334,19 +329,8 @@ RetVal<ConverterController::BatchJob> ConverterController::parseBatchJob(const m
 
         QJsonValue copyright = obj[u"copyright"];
         if (!copyright.isUndefined()) {
-            if (copyright.isObject()) {
-                QJsonValue copyrightText = copyright[u"text"];
-                if (copyrightText.isUndefined()) {
-                    rv.ret = make_ret(Err::BatchJobFileFailedParse, err.errorString().toStdString());
-                    return rv;
-                }
-
-                job.copyright.text = copyrightText.toString();
-
-                QJsonValue showOnAllPages = copyright[u"showOnAllPages"];
-                if (!showOnAllPages.isUndefined() && showOnAllPages.isBool()) {
-                    job.copyright.showOnAllPages = showOnAllPages.toBool();
-                }
+            if (copyright.isString()) {
+                job.copyright = copyright.toString();
             } else {
                 rv.ret = make_ret(Err::BatchJobFileFailedParse, err.errorString().toStdString());
                 return rv;

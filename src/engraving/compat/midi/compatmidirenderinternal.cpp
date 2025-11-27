@@ -1024,7 +1024,8 @@ static void renderHarmony(EventsHolder& events, Measure const* m, Harmony* h, in
 
     int velocity = context.velocitiesByTrack.at(h->track()).val(h->tick());
 
-    const RealizedHarmony& r = h->getRealizedHarmony();
+    RealizedHarmony r = h->getRealizedHarmony();
+    std::vector<int> pitches = r.pitches();
 
     NPlayEvent ev(ME_NOTEON, static_cast<uint8_t>(channel), 0, velocity);
     ev.setHarmony(h);
@@ -1037,9 +1038,8 @@ static void renderHarmony(EventsHolder& events, Measure const* m, Harmony* h, in
     ev.setTuning(0.0);
 
     //add play events
-    const RealizedHarmony::PitchMap& notes = r.notes();
-    for (const auto& [pitch, _] : notes) {
-        ev.setPitch(pitch);
+    for (int p : pitches) {
+        ev.setPitch(p);
         ev.setVelo(velocity);
         events[channel].emplace(onTime, ev);
         ev.setVelo(0);

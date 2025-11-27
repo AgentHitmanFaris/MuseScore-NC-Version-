@@ -47,7 +47,7 @@ void LearnService::refreshPlaylists()
 {
     auto startedPlaylistCallBack = [this](const RetVal<Playlist>& result) {
         if (!result.ret) {
-            LOGE() << "Unable to get started playlist: " << result.ret.toString();
+            LOGW() << result.ret.toString();
             return;
         }
 
@@ -65,7 +65,7 @@ void LearnService::refreshPlaylists()
 
     auto advancedPlaylistCallBack = [this](const RetVal<Playlist>& result) {
         if (!result.ret) {
-            LOGE() << "Unable to get advanced playlist: " << result.ret.toString();
+            LOGW() << result.ret.toString();
             return;
         }
 

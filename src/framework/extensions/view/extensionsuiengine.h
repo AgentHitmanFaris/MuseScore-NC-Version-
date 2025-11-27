@@ -28,7 +28,6 @@
 
 #include "modularity/ioc.h"
 #include "ui/iuiengine.h"
-#include "global/api/iapiregister.h"
 
 #include "../api/extapi.h"
 #include "../api/v1/extapiv1.h"
@@ -40,7 +39,6 @@ class ExtensionsUiEngine : public QObject, public IExtensionsUiEngine, public In
     Q_OBJECT
 
     Inject<ui::IUiEngine> uiEngine = { this };
-    Inject<muse::api::IApiRegister> apiRegister = { this };
 
 public:
     ExtensionsUiEngine(const modularity::ContextPtr& iocCtx)

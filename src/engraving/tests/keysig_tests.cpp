@@ -27,7 +27,6 @@
 #include "engraving/dom/measure.h"
 #include "engraving/dom/part.h"
 #include "engraving/editing/undo.h"
-#include "engraving/editing/transpose.h"
 
 #include "utils/scorerw.h"
 #include "utils/scorecomp.h"
@@ -146,7 +145,7 @@ TEST_F(Engraving_KeySigTests, preferSharpFlat)
     auto parts = score1->parts();
     Part* part1 = parts[0];
     part1->setPreferSharpFlat(PreferSharpFlat::FLATS);
-    Transpose::transpositionChanged(score1, part1, part1->instrument(Fraction(0, 1))->transpose(), Fraction(0, 1), Fraction(16, 4));
+    score1->transpositionChanged(part1, part1->instrument(Fraction(0, 1))->transpose(), Fraction(0, 1), Fraction(16, 4));
     score1->update();
     score1->doLayout();
     EXPECT_TRUE(ScoreComp::saveCompareScore(score1, u"preferSharpFlat-1-test.mscx", KEYSIG_DATA_DIR + u"preferSharpFlat-1-ref.mscx"));
@@ -157,7 +156,7 @@ TEST_F(Engraving_KeySigTests, preferSharpFlat)
     score2->cmdSelectAll();
     score2->startCmd(TranslatableString::untranslatable("Key signature tests"));
     // transpose augmented unison up
-    Transpose::transpose(score2, TransposeMode::BY_INTERVAL, TransposeDirection::UP, Key::C, 1, true, true, true);
+    score2->transpose(TransposeMode::BY_INTERVAL, TransposeDirection::UP, Key::C, 1, true, true, true);
     score2->endCmd();
     EXPECT_TRUE(ScoreComp::saveCompareScore(score2, u"preferSharpFlat-2-test.mscx", KEYSIG_DATA_DIR + u"preferSharpFlat-2-ref.mscx"));
     delete score2;

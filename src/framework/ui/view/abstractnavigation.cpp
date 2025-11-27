@@ -25,6 +25,8 @@
 
 #include "qmlaccessible.h"
 
+#include "log.h"
+
 using namespace muse;
 using namespace muse::ui;
 using namespace muse::accessibility;

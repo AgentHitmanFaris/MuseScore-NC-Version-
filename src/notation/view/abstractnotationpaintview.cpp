@@ -710,22 +710,6 @@ void AbstractNotationPaintView::onNotationSetup()
         scheduleRedraw();
     }, async::Asyncable::Mode::SetReplace);
 
-    engravingConfiguration()->selectionColorChanged().onReceive(this, [this](int, const muse::draw::Color&) {
-        scheduleRedraw();
-    });
-
-    engravingConfiguration()->formattingColorChanged().onReceive(this, [this](const Color&) {
-        scheduleRedraw();
-    });
-
-    engravingConfiguration()->invisibleColorChanged().onReceive(this, [this](const Color&) {
-        scheduleRedraw();
-    });
-
-    engravingConfiguration()->unlinkedColorChanged().onReceive(this, [this](const Color&) {
-        scheduleRedraw();
-    });
-
     engravingConfiguration()->debuggingOptionsChanged().onNotify(this, [this]() {
         scheduleRedraw();
     });

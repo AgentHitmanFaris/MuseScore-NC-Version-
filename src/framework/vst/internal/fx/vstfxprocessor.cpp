@@ -98,11 +98,11 @@ void VstFxProcessor::setActive(bool active)
     m_params.active = active;
 }
 
-void VstFxProcessor::process(float* buffer, unsigned int sampleCount, msecs_t playbackPosition)
+void VstFxProcessor::process(float* buffer, unsigned int sampleCount)
 {
     if (!buffer || !m_inited) {
         return;
     }
 
-    m_vstAudioClient->process(buffer, sampleCount, playbackPosition);
+    m_vstAudioClient->process(buffer, sampleCount);
 }

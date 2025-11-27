@@ -26,46 +26,13 @@
 
 #include "audio/common/audioerrors.h"
 
-#include "global/serialization/json.h"
-#include "global/realfn.h"
+#include "realfn.h"
 
 using namespace muse;
 using namespace muse::audio;
 using namespace muse::musesampler;
 
 static constexpr int AUDIO_CHANNELS_COUNT = 2;
-
-static InputProcessingProgress::StatusInfo::StatusData parseStatusData(const std::string& json)
-{
-    if (json.empty()) {
-        return {};
-    }
-
-    std::string err;
-    JsonDocument doc = JsonDocument::fromJson(ByteArray(json.c_str()), &err);
-
-    if (!err.empty() || !doc.isObject()) {
-        LOGE() << "JSON parse error: " << err << ", json: " << json;
-        return {};
-    }
-
-    JsonObject obj = doc.rootObject();
-    InputProcessingProgress::StatusInfo::StatusData data;
-
-    if (obj.contains("libraryName")) {
-        data["libraryName"] = obj.value("libraryName").toStdString();
-    }
-
-    if (obj.contains("date")) {
-        data["date"] = obj.value("date").toStdString();
-    }
-
-    if (obj.contains("url")) {
-        data["url"] = obj.value("url").toStdString();
-    }
-
-    return data;
-}
 
 MuseSamplerWrapper::MuseSamplerWrapper(MuseSamplerLibHandlerPtr samplerLib,
                                        const InstrumentInfo& instrument,
@@ -382,43 +349,31 @@ void MuseSamplerWrapper::updateRenderingProgress(ms_RenderingRangeList list, int
         return;
     }
 
-    InputProcessingProgress::ChunkInfoList chunks;
+    audio::InputProcessingProgress::ChunkInfoList chunks;
     chunks.reserve(size);
 
     long long chunksDurationUs = 0;
     bool isRendering = false;
 
     for (int i = 0; i < size; ++i) {
-        const RenderRangeInfo info = m_samplerLib->getNextRenderProgressInfo(list);
+        const ms_RenderRangeInfo info = m_samplerLib->getNextRenderProgressInfo(list);
 
         switch (info._state) {
         case ms_RenderingState_Rendering:
             isRendering = true;
             break;
         case ms_RenderingState_ErrorNetwork:
-            m_renderingInfo.errorCode = (int)Err::OnlineSoundsProcessingError;
-            m_renderingInfo.errorText = "Network error";
+            m_renderingInfo.error = "Network error";
             break;
         case ms_RenderingState_ErrorRendering:
-            m_renderingInfo.errorCode = (int)Err::OnlineSoundsProcessingError;
-            m_renderingInfo.errorText = "Rendering error";
+            m_renderingInfo.error = "Rendering error";
             break;
         case ms_RenderingState_ErrorFileIO:
-            m_renderingInfo.errorCode = (int)Err::OnlineSoundsProcessingError;
-            m_renderingInfo.errorText = "File IO error";
+            m_renderingInfo.error = "File IO error";
             break;
         case ms_RenderingState_ErrorTimeOut:
-            m_renderingInfo.errorCode = (int)Err::OnlineSoundsProcessingError;
-            m_renderingInfo.errorText = "Timeout";
+            m_renderingInfo.error = "Timeout";
             break;
-        case ms_RenderingState_ErrorLimitReached:
-            m_renderingInfo.errorCode = (int)Err::OnlineSoundsLimitReached;
-            m_renderingInfo.errorText = "Limit reached";
-            break;
-        }
-
-        if (info._error_message) {
-            m_renderingInfo.errorData = info._error_message;
         }
 
         // Failed regions remain in the list, but should be excluded when
@@ -466,9 +421,8 @@ void MuseSamplerWrapper::updateRenderingProgress(ms_RenderingRangeList list, int
 
     // Finish progress
     if (chunksDurationUs <= 0) {
-        m_inputProcessingProgress.finish(m_renderingInfo.errorCode,
-                                         m_renderingInfo.errorText,
-                                         parseStatusData(m_renderingInfo.errorData));
+        const int errcode = !m_renderingInfo.error.empty() ? (int)muse::audio::Err::OnlineSoundsProcessingError : 0;
+        m_inputProcessingProgress.finish(errcode, m_renderingInfo.error);
         m_renderingInfo.clear();
     }
 }

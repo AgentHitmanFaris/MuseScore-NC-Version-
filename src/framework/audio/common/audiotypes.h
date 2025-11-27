@@ -31,7 +31,6 @@
 #include "global/types/secs.h"
 #include "global/types/ratio.h"
 #include "global/types/string.h"
-#include "global/types/ret.h"
 #include "global/realfn.h"
 #include "global/async/channel.h"
 #include "global/io/iodevice.h"
@@ -502,25 +501,23 @@ struct InputProcessingProgress {
         Status status = Status::Undefined;
         int errorCode = 0;
         std::string errorText;
-        using StatusData = std::map<std::string, std::string>;
-        StatusData data;
     };
 
     void start()
     {
         isStarted = true;
-        processedChannel.send({ Status::Started, 0, {}, {} }, {}, {});
+        processedChannel.send({ Status::Started, 0, {} }, {}, {});
     }
 
-    void process(const ChunkInfoList& chunks, int64_t current, int64_t total)
+    void process(const ChunkInfoList& chuncs, int64_t current, int64_t total)
     {
-        processedChannel.send({ Status::Processing, 0, {}, {} }, chunks, { current, total });
+        processedChannel.send({ Status::Processing, 0, {} }, chuncs, { current, total });
     }
 
-    void finish(int errcode, const std::string& err = {}, const StatusInfo::StatusData& data = {})
+    void finish(int errcode, const std::string& err = {})
     {
         isStarted = false;
-        processedChannel.send({ Status::Finished, errcode, err, data }, {}, {});
+        processedChannel.send({ Status::Finished, errcode, err }, {}, {});
     }
 
     bool isStarted = false;

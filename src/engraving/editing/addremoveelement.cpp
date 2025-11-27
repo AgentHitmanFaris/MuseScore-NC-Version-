@@ -77,9 +77,6 @@ static void undoAddTuplet(DurationElement* cr)
 AddElement::AddElement(EngravingItem* e)
 {
     DO_ASSERT_X(!e->generated(), String(u"Generated item %1 passed to AddElement").arg(String::fromAscii(e->typeName())));
-    DO_ASSERT_X(e->parent()->score() == e->score(),
-                String(u"Item %1 is in a different score to its parent %2").arg(String::fromAscii(e->typeName()),
-                                                                                String::fromAscii(e->parent()->typeName())));
     element = e;
 }
 

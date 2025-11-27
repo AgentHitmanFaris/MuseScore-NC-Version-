@@ -19,11 +19,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
+#ifndef MU_NOTATION_NOTEINPUTBARCUSOMISEMODEL_H
+#define MU_NOTATION_NOTEINPUTBARCUSOMISEMODEL_H
 
-#pragma once
-
+#include "uicomponents/view/selectableitemlistmodel.h"
 #include "async/asyncable.h"
-#include "uicomponents/qml/Muse/UiComponents/selectableitemlistmodel.h"
 
 #include "modularity/ioc.h"
 #include "ui/iuiconfiguration.h"
@@ -87,3 +87,5 @@ private:
     bool m_isAddSeparatorAvailable = false;
 };
 }
+
+#endif // MU_NOTATION_NOTEINPUTBARCUSOMISEMODEL_H

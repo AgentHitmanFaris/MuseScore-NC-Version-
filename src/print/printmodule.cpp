@@ -21,8 +21,6 @@
  */
 #include "printmodule.h"
 
-#include <memory>
-
 #include "modularity/ioc.h"
 
 #include "internal/printprovider.h"
@@ -37,5 +35,5 @@ std::string PrintModule::moduleName() const
 
 void PrintModule::registerExports()
 {
-    ioc()->registerExport<IPrintProvider>(moduleName(), std::make_shared<PrintProvider>(iocContext()));
+    ioc()->registerExport<IPrintProvider>(moduleName(), new PrintProvider());
 }

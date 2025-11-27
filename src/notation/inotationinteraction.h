@@ -171,8 +171,7 @@ public:
     virtual void startEditGrip(EngravingItem* element, mu::engraving::Grip grip) = 0;
     virtual void endEditGrip() = 0;
 
-    virtual bool isEditingElement() const = 0;
-    virtual muse::async::Notification isEditingElementChanged() const = 0;
+    virtual bool isElementEditStarted() const = 0;
     virtual void startEditElement(EngravingItem* element) = 0;
     virtual void changeEditElement(EngravingItem* newElement) = 0;
     virtual bool isEditAllowed(QKeyEvent* event) = 0;
@@ -191,7 +190,7 @@ public:
     virtual void addBoxes(BoxType boxType, int count, int beforeBoxIndex, bool insertAfter) = 0;
 
     virtual void copySelection() = 0;
-    virtual void repeatSelection() = 0;
+    virtual muse::Ret repeatSelection() = 0;
     virtual void copyLyrics() = 0;
     virtual void pasteSelection(const Fraction& scale = Fraction(1, 1)) = 0;
     virtual void swapSelection() = 0;
@@ -272,8 +271,6 @@ public:
 
     virtual void changeEnharmonicSpelling(bool both) = 0;
     virtual void spellPitches() = 0;
-    virtual void spellPitchesWithSharps() = 0;
-    virtual void spellPitchesWithFlats() = 0;
     virtual void regroupNotesAndRests() = 0;
     virtual void resequenceRehearsalMarks() = 0;
 
@@ -337,8 +334,6 @@ public:
     virtual muse::async::Channel<ShowItemRequest> showItemRequested() const = 0;
 
     virtual void setGetViewRectFunc(const std::function<muse::RectF()>& func) = 0;
-
-    virtual void checkAndShowError() = 0;
 
     virtual void toggleDebugShowGapRests() = 0;
 };

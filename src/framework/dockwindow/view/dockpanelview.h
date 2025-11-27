@@ -25,7 +25,7 @@
 
 #include "internal/dockbase.h"
 
-#include "uicomponents/qml/Muse/UiComponents/abstractmenumodel.h"
+#include "uicomponents/view/abstractmenumodel.h"
 
 class QQmlComponent;
 

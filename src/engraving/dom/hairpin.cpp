@@ -309,8 +309,7 @@ EngravingItem* HairpinSegment::findElementToSnapBefore(bool ignoreInvisible) con
     auto intervals = score()->spannerMap().findOverlapping(startTick.ticks(), startTick.ticks());
     for (auto interval : intervals) {
         Spanner* spanner = interval.value;
-        bool isValidHairpin = spanner->isHairpin() && !spanner->segmentsEmpty() && spanner != thisHairpin
-                              && (spanner->addToSkyline() || !ignoreInvisible);
+        bool isValidHairpin = spanner->isHairpin() && !spanner->segmentsEmpty() && spanner->visible() && spanner != thisHairpin;
         if (!isValidHairpin) {
             continue;
         }
@@ -367,7 +366,7 @@ TextBase* HairpinSegment::findStartDynamicOrExpression(bool ignoreInvisible) con
             if (!item->isDynamic() && !item->isExpression()) {
                 continue;
             }
-            if (ignoreInvisible && !item->addToSkyline()) {
+            if (ignoreInvisible && !item->visible()) {
                 continue;
             }
             bool endsMatch = item->track() == hairpin()->track()
@@ -421,7 +420,7 @@ TextBase* HairpinSegment::findEndDynamicOrExpression(bool ignoreInvisible) const
             if (!item->isDynamic() && !item->isExpression()) {
                 continue;
             }
-            if (ignoreInvisible && !item->addToSkyline()) {
+            if (ignoreInvisible && !item->visible()) {
                 continue;
             }
             bool endsMatch = item->track() == hairpin()->track()

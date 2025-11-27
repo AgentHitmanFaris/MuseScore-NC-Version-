@@ -481,8 +481,7 @@ void MultiInstancesProvider::quitAllAndRestartLast()
 
 void MultiInstancesProvider::quitAllAndRunInstallation(const io::path_t& installerPath)
 {
-    //! NOTE: Path can be null in some test modes...
-    if (!isInited() || installerPath.empty()) {
+    if (!isInited()) {
         return;
     }
 

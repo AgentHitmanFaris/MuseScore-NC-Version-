@@ -802,11 +802,6 @@
     <autorepeat>0</autorepeat>
     </SC>
   <SC>
-    <key>play-from-selection</key>
-    <seq>Shift+Space</seq>
-    <autorepeat>0</autorepeat>
-    </SC>
-  <SC>
     <key>pause-and-select</key>
     <seq>Alt+Space</seq>
     <autorepeat>0</autorepeat>

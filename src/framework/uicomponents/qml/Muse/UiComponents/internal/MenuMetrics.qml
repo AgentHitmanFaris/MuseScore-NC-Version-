@@ -22,7 +22,7 @@
 import QtQml 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 QtObject {
     id: root

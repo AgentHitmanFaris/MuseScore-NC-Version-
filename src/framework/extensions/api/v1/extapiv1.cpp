@@ -26,6 +26,7 @@
 #include "messagedialog.h"
 #include "filedialog.h"
 #include "qqmlsettings_p.h"
+#include "util.h"
 #include "iapiv1object.h"
 
 #include "log.h"
@@ -34,6 +35,9 @@ using namespace muse::extensions::apiv1;
 
 void ExtApiV1::registerQmlTypes()
 {
+    qmlRegisterType<MsProcess>("MuseScore", 3, 0, "QProcess");
+    qmlRegisterType<FileIO, 1>("FileIO",    3, 0, "FileIO");
+
     qmlRegisterUncreatableType<StandardButton>("MuseScore", 3, 0, "StandardButton", "Cannot create an enumeration");
     qmlRegisterType<MessageDialog>("MuseScore", 3, 0, "MessageDialog");
     qmlRegisterType<QQmlSettings>("MuseScore", 3, 0, "Settings");

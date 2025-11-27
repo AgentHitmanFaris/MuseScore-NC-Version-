@@ -642,11 +642,9 @@ static void drawDots(const BarLine* item, Painter* painter, double x)
         y2l = 2.5 * spatium;
     } else {
         const StaffType* st = item->staffType();
-        const int lines = st->lines();
-        const double lineDistance = st->lineDistance().toMM(spatium);
 
-        y1l = (static_cast<double>((lines - 1) / 2) - 0.5) * lineDistance;
-        y2l = (static_cast<double>(lines / 2) + 0.5) * lineDistance;
+        y1l = st->doty1() * spatium;
+        y2l = st->doty2() * spatium;
 
         //adjust for staffType offset
         double stYOffset = item->staffOffsetY();
@@ -1556,13 +1554,13 @@ void TDraw::draw(const GlissandoSegment* item, Painter* painter, const PaintOpti
 
         painter->drawLine(LineF(0.0, 0.0, l, 0.0));
     } else if (glissando->glissandoType() == GlissandoType::WAVY) {
-        RectF b = item->symBbox(SymId::wiggleGlissando);
-        double a  = item->symAdvance(SymId::wiggleGlissando);
+        RectF b = item->symBbox(SymId::wiggleTrill);
+        double a  = item->symAdvance(SymId::wiggleTrill);
         int n    = static_cast<int>(l / a);          // always round down (truncate) to avoid overlap
         double x  = (l - n * a) * 0.5;     // centre line in available space
         SymIdList ids;
         for (int i = 0; i < n; ++i) {
-            ids.push_back(SymId::wiggleGlissando);
+            ids.push_back(SymId::wiggleTrill);
         }
 
         item->score()->engravingFont()->draw(ids, painter, item->magS(), PointF(x, -(b.y() + b.height() * 0.5)));

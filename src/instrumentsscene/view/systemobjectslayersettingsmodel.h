@@ -26,6 +26,7 @@
 
 #include "modularity/ioc.h"
 #include "context/iglobalcontext.h"
+#include "notation/inotation.h"
 
 #include "layoutpanelutils.h"
 

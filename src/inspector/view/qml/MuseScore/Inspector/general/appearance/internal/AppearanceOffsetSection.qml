@@ -22,7 +22,7 @@
 import QtQuick 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import MuseScore.Inspector 1.0
 
 import "../../../common"
@@ -34,7 +34,6 @@ Column {
 
     property bool isSnappedToGrid: false
     property alias isVerticalOffsetAvailable: offsets.isVerticalOffsetAvailable
-    property alias measurementUnits: offsets.measurementUnits
 
     property NavigationPanel navigationPanel: null
     property int navigationRowStart: 0

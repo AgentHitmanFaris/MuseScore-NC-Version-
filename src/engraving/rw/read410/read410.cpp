@@ -22,7 +22,6 @@
 #include "read410.h"
 
 #include "../editing/mscoreview.h"
-#include "../editing/transpose.h"
 #include "../types/types.h"
 
 #include "dom/anchors.h"
@@ -551,12 +550,7 @@ bool Read410::pasteStaff(XmlReader& e, Segment* dst, staff_idx_t dstStaff, Fract
                             for (size_t i = 0; i < graceNotes.size(); ++i) {
                                 Chord* gc = graceNotes.at(i);
                                 gc->setGraceIndex(i);
-                                if (gc->vStaffIdx() >= gc->score()->nstaves()) {
-                                    // check if staffMove moves a note to a
-                                    // nonexistent staff
-                                    gc->setStaffMove(0);
-                                }
-                                Transpose::transposeChord(gc, tick);
+                                Score::transposeChord(gc, tick);
                                 chord->add(gc);
                             }
                             graceNotes.clear();
@@ -624,7 +618,7 @@ bool Read410::pasteStaff(XmlReader& e, Segment* dst, staff_idx_t dstStaff, Fract
                     Interval interval = staffDest->transpose(tick);
                     if (!ctx.style().styleB(Sid::concertPitch) && !interval.isZero()) {
                         interval.flip();
-                        Transpose::undoTransposeHarmony(score, harmony, interval);
+                        score->undoTransposeHarmony(harmony, interval);
                     }
 
                     // remove pre-existing chords on this track
@@ -1007,7 +1001,7 @@ void Read410::pasteSymbols(XmlReader& e, ChordRest* dst)
                     Interval interval = staffDest->transpose(destTick);
                     if (!ctx.style().styleB(Sid::concertPitch) && !interval.isZero()) {
                         interval.flip();
-                        Transpose::undoTransposeHarmony(score, el, interval);
+                        score->undoTransposeHarmony(el, interval);
                     }
                     el->setParent(seg);
                     score->undoAddElement(el);

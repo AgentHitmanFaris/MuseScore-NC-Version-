@@ -66,6 +66,7 @@ Image::Image(EngravingItem* parent)
     m_lockAspectRatio = defaultLockAspectRatio;
     m_autoScale       = defaultAutoScale;
     m_sizeIsSpatium   = defaultSizeIsSpatium;
+    m_linkIsValid     = false;
 }
 
 Image::Image(const Image& img)
@@ -82,6 +83,8 @@ Image::Image(const Image& img)
     if (m_storeItem) {
         m_storeItem->reference(this);
     }
+    m_linkPath        = img.m_linkPath;
+    m_linkIsValid     = img.m_linkIsValid;
     if (m_imageType == ImageType::RASTER) {
         m_rasterDoc = img.m_rasterDoc ? std::make_shared<Pixmap>(*img.m_rasterDoc) : nullptr;
     } else if (m_imageType == ImageType::SVG) {
@@ -208,46 +211,63 @@ double Image::imageWidth() const
     return m_size.width();
 }
 
-bool Image::loadFromStore(const std::string& storePath)
+bool Image::load()
 {
-    m_storePath = storePath;
-    if (storePath.empty()) {
-        return false;
+    // once all paths are read, load img or retrieve it from store
+    // loading from file is tried first to update the stored image, if necessary
+
+    muse::io::path_t path;
+    bool loaded = false;
+    // if a store path is given, attempt to get the image from the store
+    if (!m_storePath.isEmpty()) {
+        m_storeItem = imageStore.getImage(m_storePath);
+        if (m_storeItem) {
+            m_storeItem->reference(this);
+            loaded = true;
+        }
+        // if no image in store, attempt to load from path (for backward compatibility)
+        else {
+            loaded = load(m_storePath);
+        }
+        path = m_storePath;
+    }
+    // if no success from store path, attempt loading from link path (for .mscx files)
+    if (!loaded) {
+        loaded = load(m_linkPath);
+        m_linkIsValid = loaded;
+        path = m_linkPath;
     }
 
-    m_storeItem = imageStore.getImage(storePath);
-    if (!m_storeItem) {
-        return false;
-    }
-    m_storeItem->reference(this);
-
-    std::string suffix = muse::io::suffix(storePath);
-    if (suffix == "svg" || suffix == "svgz") {
+    if (path.withSuffix("svg") || path.withSuffix("svgz")) {
         setImageType(ImageType::SVG);
     } else {
         setImageType(ImageType::RASTER);
     }
 
-    return true;
+    return loaded;
 }
 
 //---------------------------------------------------------
-//   loadFromFile
+//   load
 //    load image from file and put into ImageStore
 //    return true on success
 //---------------------------------------------------------
 
-bool Image::loadFromFile(muse::io::path_t path)
+bool Image::load(const muse::io::path_t& ss)
 {
-    if (path.empty()) {
+    if (ss.empty()) {
         return false;
     }
 
-    if (FileInfo(path).isRelative()) {
-        // if file path is relative, prepend score path
+    muse::io::path_t path(ss);
+    // if file path is relative, prepend score path
+    FileInfo fi(path);
+    if (fi.isRelative()) {
         path = masterScore()->fileInfo()->absoluteDirPath() + '/' + path;
+        fi = FileInfo(path);
     }
 
+    m_linkIsValid = false;                       // assume link fname is invalid
     File f(path);
     if (!f.open(IODevice::ReadOnly)) {
         LOGD() << "failed load file: " << path;
@@ -256,9 +276,11 @@ bool Image::loadFromFile(muse::io::path_t path)
     muse::ByteArray ba = f.readAll();
     f.close();
 
-    m_storeItem = imageStore.add(path.toStdString(), ba);
+    m_linkIsValid = true;
+    m_linkPath = fi.canonicalFilePath();
+    m_storeItem = imageStore.add(m_linkPath, ba);
     m_storeItem->reference(this);
-    if (path.hasSuffix("svg") || path.hasSuffix("svgz")) {
+    if (path.withSuffix("svg") || path.withSuffix("svgz")) {
         setImageType(ImageType::SVG);
     } else {
         setImageType(ImageType::RASTER);
@@ -272,13 +294,13 @@ bool Image::loadFromFile(muse::io::path_t path)
 //    return true on success
 //---------------------------------------------------------
 
-bool Image::loadFromData(const std::string& name, const muse::ByteArray& ba)
+bool Image::loadFromData(const path_t& name, const muse::ByteArray& ba)
 {
+    m_linkIsValid = false;
+    m_linkPath = u"";
     m_storeItem = imageStore.add(name, ba);
     m_storeItem->reference(this);
-
-    muse::io::path_t ioPath(name);
-    if (ioPath.hasSuffix("svg") || ioPath.hasSuffix("svgz")) {
+    if (name.withSuffix("svg") || name.withSuffix("svgz")) {
         setImageType(ImageType::SVG);
     } else {
         setImageType(ImageType::RASTER);

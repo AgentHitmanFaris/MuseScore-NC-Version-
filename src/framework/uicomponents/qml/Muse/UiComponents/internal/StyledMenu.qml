@@ -19,13 +19,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-pragma ComponentBehavior: Bound
+import QtQuick 2.15
+import QtQuick.Controls 2.15
+import QtQuick.Layouts 1.15
+import QtQuick.Window 2.15
 
-import QtQuick
-import QtQuick.Window
-
-import Muse.Ui
-import Muse.UiComponents
+import Muse.Ui 1.0
+import Muse.UiComponents 1.0
 
 MenuView {
     id: root
@@ -33,7 +33,7 @@ MenuView {
     property alias model: view.model
 
     property int preferredAlign: Qt.AlignRight // Left, HCenter, Right
-    required property bool hasSiblingMenus
+    property bool hasSiblingMenus: loader.hasSiblingMenus
 
     signal handleMenuItem(string itemId)
     signal openPrevMenu()
@@ -336,30 +336,34 @@ MenuView {
             delegate: Loader {
                 id: loader
 
-                required property var model
-                required property int index
-
-                readonly property var modelData: Boolean(root.model.get) ? model.itemRole : model.modelData
-                readonly property bool isSeparator: !(modelData?.title)
+                property var itemData: Boolean(root.model.get) ? model.itemRole : modelData
+                property bool isSeparator: !Boolean(itemData) || !Boolean(itemData.title) || itemData.title === ""
 
                 sourceComponent: isSeparator ? separatorComp : menuItemComp
+
+                onLoaded: {
+                    loader.item.modelData = Qt.binding(() => (itemData))
+                    loader.item.width = Qt.binding(() => ( Boolean(root.menuMetrics) ? root.menuMetrics.itemWidth : 0 ))
+                    if (Boolean(loader.item.navigation)) {
+                        loader.item.navigation.panel = content.navigationPanel
+                    }
+                }
 
                 Component {
                     id: menuItemComp
 
                     StyledMenuItem {
                         id: item
-                        width: root.menuMetrics?.itemWidth ?? 0
 
-                        modelData: loader.modelData
+                        property string title: Boolean (loader.itemData) ? loader.itemData.title : ""
 
                         menuAnchorItem: root.anchorItem
                         parentWindow: root.window
 
                         navigation.panel: content.navigationPanel
-                        navigation.row: loader.index
+                        navigation.row: model.index
 
-                        iconAndCheckMarkMode: root.menuMetrics?.iconAndCheckMarkMode || StyledMenuItem.None
+                        iconAndCheckMarkMode: Boolean(root.menuMetrics) ? root.menuMetrics.iconAndCheckMarkMode : StyledMenuItem.None
 
                         reserveSpaceForShortcutsOrSubmenuIndicator: Boolean(root.menuMetrics) ?
                                                                         (root.menuMetrics.hasItemsWithShortcut || root.menuMetrics.hasItemsWithSubmenu) : false
@@ -405,9 +409,10 @@ MenuView {
                     id: separatorComp
 
                     Rectangle {
-                        width: root.menuMetrics?.itemWidth ?? 0
                         height: prv.separatorHeight
                         color: ui.theme.strokeColor
+
+                        property var modelData
                     }
                 }
             }

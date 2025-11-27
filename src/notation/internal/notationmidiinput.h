@@ -67,7 +67,7 @@ private:
 
     using ControllerEventMap = std::map<muse::midi::Event::Opcode, muse::midi::Event>;
     void triggerControllers(const ControllerEventMap& events);
-    void releasePlayingNotes(const std::vector<int>& pitches);
+    void releasePlayingNotes(const std::vector<int>& pitches, bool deleteNotes = false);
 
     void enableMetronome();
     void disableMetronome();
@@ -101,12 +101,7 @@ private:
     bool m_shouldDisableMetronome = false;
     bool m_holdingNotesInInputByDuration = false;
 
-    struct PlayingNote {
-        bool isPreview = false;
-        Note* note = nullptr;
-    };
-
-    std::map<int, PlayingNote> m_playingNotes;
+    std::map<int, Note*> m_playingNotes;
 };
 }
 

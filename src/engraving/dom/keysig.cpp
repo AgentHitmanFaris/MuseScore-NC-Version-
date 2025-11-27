@@ -30,8 +30,6 @@
 #include "staff.h"
 #include "part.h"
 
-#include "editing/transpose.h"
-
 #include "log.h"
 
 using namespace mu;
@@ -114,7 +112,7 @@ void KeySig::setKey(Key cKey)
         Interval v = staff()->part()->instrument(tick())->transpose();
         if (!v.isZero()) {
             v.flip();
-            Key tKey = Transpose::transposeKey(cKey, v, staff()->part()->preferSharpFlat());
+            Key tKey = transposeKey(cKey, v, staff()->part()->preferSharpFlat());
             e.setKey(tKey);
         }
     }

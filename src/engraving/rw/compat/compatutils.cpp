@@ -45,7 +45,6 @@
 #include "dom/capo.h"
 #include "dom/noteline.h"
 #include "dom/textline.h"
-#include "editing/transpose.h"
 #include "style/styledef.h"
 
 #include "engraving/style/textstyle.h"
@@ -743,7 +742,7 @@ void CompatUtils::addMissingInitKeyForTransposingInstrument(MasterScore* score)
                     Key key = Key::C;
                     Key cKey = key;
                     if (!score->style().styleB(Sid::concertPitch)) {
-                        cKey = Transpose::transposeKey(key, v);
+                        cKey = transposeKey(key, v);
                     }
                     kse.setConcertKey(cKey);
                     kse.setKey(key);

@@ -161,8 +161,6 @@
 
 #include "dom/whammybar.h"
 
-#include "editing/transpose.h"
-
 #include "../xmlwriter.h"
 #include "writecontext.h"
 #include "connectorinfowriter.h"
@@ -1645,6 +1643,17 @@ void TWrite::writeProperties(const SLine* item, XmlWriter& xml, WriteContext& ct
     writeProperty(item, xml, Pid::DASH_LINE_LEN);
     writeProperty(item, xml, Pid::DASH_GAP_LEN);
 
+    if (item->score()->isPaletteScore()) {
+        // when used as icon
+        if (!item->spannerSegments().empty()) {
+            const LineSegment* s = item->frontSegment();
+            xml.tag("length", s->pos2().x());
+        } else {
+            xml.tag("length", item->spatium() * 4);
+        }
+        return;
+    }
+
     if (!item->isUserModified()) {
         return;
     }
@@ -1780,8 +1789,8 @@ static void writeHarmonyInfo(const HarmonyInfo* item, const Harmony* h, XmlWrite
             Fraction tick = segment ? segment->tick() : Fraction(-1, 1);
             const Interval& interval = h->staff()->transpose(tick);
             if (ctx.clipboardmode() && !h->score()->style().styleB(Sid::concertPitch) && interval.chromatic) {
-                rRootTpc = Transpose::transposeTpc(item->rootTpc(), interval, true);
-                rBassTpc = Transpose::transposeTpc(item->bassTpc(), interval, true);
+                rRootTpc = transposeTpc(item->rootTpc(), interval, true);
+                rBassTpc = transposeTpc(item->bassTpc(), interval, true);
             }
         }
 
@@ -1915,10 +1924,57 @@ void TWrite::writeProperties(const BSymbol* item, XmlWriter& xml, WriteContext& 
 
 void TWrite::write(const Image* item, XmlWriter& xml, WriteContext& ctx)
 {
+    // attempt to convert the _linkPath to a path relative to the score
+    //
+    // TODO : on Save As, score()->fileInfo() still contains the old path and fname
+    //          if the Save As path is different, image relative path will be wrong!
+    //
+    String relativeFilePath;
+    if (!item->linkPath().isEmpty() && item->linkIsValid()) {
+        muse::io::FileInfo fi(item->linkPath());
+        // score()->fileInfo()->canonicalPath() would be better
+        // but we are saving under a temp file name and the 'final' file
+        // might not exist yet, so canonicalFilePath() may return only "/"
+        // OTOH, the score 'final' file name is practically always canonical, at this point
+        String scorePath = item->score()->masterScore()->fileInfo()->absoluteDirPath().toString();
+        String imgFPath  = fi.canonicalFilePath();
+        // if imgFPath is in (or below) the directory of scorePath
+        if (imgFPath.startsWith(scorePath, muse::CaseSensitive)) {
+            // relative img path is the part exceeding scorePath
+            imgFPath.remove(0, scorePath.size());
+            if (imgFPath.startsWith(u'/')) {
+                imgFPath.remove(0, 1);
+            }
+            relativeFilePath = imgFPath;
+        }
+        // try 1 level up
+        else {
+            // reduce scorePath by one path level
+            fi = muse::io::FileInfo(scorePath);
+            scorePath = fi.path();
+            // if imgFPath is in (or below) the directory up the score directory
+            if (imgFPath.startsWith(scorePath, muse::CaseSensitive)) {
+                // relative img path is the part exceeding new scorePath plus "../"
+                imgFPath.remove(0, scorePath.size());
+                if (!imgFPath.startsWith(u'/')) {
+                    imgFPath.prepend(u'/');
+                }
+                imgFPath.prepend(u"..");
+                relativeFilePath = imgFPath;
+            }
+        }
+    }
+    // if no match, use full _linkPath
+    if (relativeFilePath.isEmpty()) {
+        relativeFilePath = item->linkPath();
+    }
+
     xml.startElement(item);
     writeProperties(static_cast<const BSymbol*>(item), xml, ctx);
-
-    xml.tag("path", item->storeItem() ? item->storeItem()->hashName() : std::string());
+    // keep old "path" tag, for backward compatibility and because it is used elsewhere
+    // (for instance by Box:read(), Measure:read(), Note:read(), ...)
+    xml.tag("path", item->storeItem() ? item->storeItem()->hashName() : relativeFilePath);
+    xml.tag("linkPath", relativeFilePath);
 
     writeProperty(item, xml, Pid::AUTOSCALE);
     writeProperty(item, xml, Pid::SIZE);
@@ -2121,12 +2177,10 @@ void TWrite::write(const MidiArticulation* item, XmlWriter& xml)
 void TWrite::write(const StaffName& item, XmlWriter& xml, const char* tag)
 {
     if (!item.name().isEmpty()) {
-        String name = item.name();
-        lineBreakToTag(name);
         if (item.pos() == 0) {
-            xml.writeXml(String::fromUtf8(tag), name);
+            xml.writeXml(String::fromUtf8(tag), item.name());
         } else {
-            xml.writeXml(String(u"%1 pos=\"%2\"").arg(String::fromUtf8(tag)).arg(item.pos()), name);
+            xml.writeXml(String(u"%1 pos=\"%2\"").arg(String::fromUtf8(tag)).arg(item.pos()), item.name());
         }
     }
 }

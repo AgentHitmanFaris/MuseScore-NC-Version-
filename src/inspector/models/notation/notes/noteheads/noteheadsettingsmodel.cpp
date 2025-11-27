@@ -74,7 +74,6 @@ void NoteheadSettingsModel::loadProperties()
 
     loadProperties(propertyIdSet);
     updateIsTrillCueNote();
-    updatemeasurementUnits();
 }
 
 void NoteheadSettingsModel::resetProperties()

@@ -32,7 +32,7 @@ public:
     muse::async::Promise<Ret> checkForUpdate(bool manual) override;
 
     bool hasUpdate() const override;
-    muse::async::Promise<Ret> showUpdate() override;
+    muse::Ret showUpdate() override;
 };
 }
 

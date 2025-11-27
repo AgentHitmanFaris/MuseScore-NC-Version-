@@ -19,11 +19,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-pragma ComponentBehavior: Bound
+import QtQuick 2.15
 
-import QtQuick
-
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 
 import "internal"
 
@@ -67,7 +65,7 @@ Loader {
         focusPolicies: PopupView.NoFocus
 
         accessibleName: loader.accessibleName
-        hasSiblingMenus: loader.hasSiblingMenus
+
         parentWindow: loader.parentWindow
 
         onHandleMenuItem: function(itemId) {

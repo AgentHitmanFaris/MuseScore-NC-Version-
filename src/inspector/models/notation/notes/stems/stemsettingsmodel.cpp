@@ -66,7 +66,6 @@ void StemSettingsModel::loadProperties()
     };
 
     loadProperties(propertyIdSet);
-    updatemeasurementUnits();
     emit useStraightNoteFlagsChanged();
 }
 

@@ -22,6 +22,8 @@
 
 #include "musesoundslistmodel.h"
 
+#include "log.h"
+
 using namespace mu::musesounds;
 
 static const QVariantMap soundLibraryInfoToMap(const SoundLibraryInfo& soundLibraryInfo)

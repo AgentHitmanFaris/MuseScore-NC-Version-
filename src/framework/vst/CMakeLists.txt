@@ -101,7 +101,7 @@ set(MODULE_INCLUDE
     )
 
 set(MODULE_LINK
-    vst3sdk
+    vst_sdk_3
     )
 
 if (QT_SUPPORT)

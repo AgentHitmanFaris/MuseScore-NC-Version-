@@ -12515,28 +12515,28 @@
         <source>China cymbal for drum kit.</source>
         <comment>china-cymbal description</comment>
         <extracomment>description for China Cymbal; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Kinacymbal för trumset.</translation>
+        <translation>Kinasymbal för trumset</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4183"/>
         <source>China Cymbal</source>
         <comment>china-cymbal trackName</comment>
         <extracomment>trackName for China Cymbal; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Kinacymbal</translation>
+        <translation>Kinasymbal</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4185"/>
         <source>China Cymbal</source>
         <comment>china-cymbal longName</comment>
         <extracomment>longName for China Cymbal; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Kinacymbal</translation>
+        <translation>Kinasymbal</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4187"/>
         <source>Ch. Cym.</source>
         <comment>china-cymbal shortName</comment>
         <extracomment>shortName for China Cymbal; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Kinacym.</translation>
+        <translation>Ch. Cym.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4190"/>
@@ -12655,7 +12655,7 @@
         <source>Large Chinese cymbal.</source>
         <comment>dabo description</comment>
         <extracomment>description for Dabo; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Stor kinesisk cymbal.</translation>
+        <translation type="unfinished"/>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4228"/>
@@ -12739,28 +12739,28 @@
         <source>Cowbell.</source>
         <comment>cowbell description</comment>
         <extracomment>description for Cowbell; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Koskälla.</translation>
+        <translation>Koklocka.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4255"/>
         <source>Cowbell</source>
         <comment>cowbell trackName</comment>
         <extracomment>trackName for Cowbell; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Koskälla</translation>
+        <translation>Koklocka</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4257"/>
         <source>Cowbell</source>
         <comment>cowbell longName</comment>
         <extracomment>longName for Cowbell; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Koskälla</translation>
+        <translation>Koklocka</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4259"/>
         <source>Cwb.</source>
         <comment>cowbell shortName</comment>
         <extracomment>shortName for Cowbell; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Kosk.</translation>
+        <translation>Cwb.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4262"/>
@@ -12956,7 +12956,7 @@
         <source>Mk. Tr.</source>
         <comment>mark-tree shortName</comment>
         <extracomment>shortName for Mark Tree; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Vindsp.</translation>
+        <translation>Mk. Tr.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4325"/>
@@ -13747,7 +13747,7 @@
         <source>Stones.</source>
         <comment>stones description</comment>
         <extracomment>description for Stones; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Stenar.</translation>
+        <translation>Stenar</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4579"/>
@@ -14307,7 +14307,7 @@
         <source>Soprano voice.</source>
         <comment>soprano description</comment>
         <extracomment>description for Soprano; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Sopranstämma.</translation>
+        <translation>Sopranstämma</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4768"/>
@@ -14363,7 +14363,7 @@
         <source>Mezzo-soprano voice.</source>
         <comment>mezzo-soprano description</comment>
         <extracomment>description for Mezzo-soprano; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Mezzosopranstämma.</translation>
+        <translation>Mezzo-sopranstämma.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4786"/>
@@ -14391,14 +14391,14 @@
         <source>Mezzo-soprano voice (notated in C clef).</source>
         <comment>mezzo-soprano-c-clef description</comment>
         <extracomment>description for Mezzo-soprano (C clef); Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Mezzosopranstämma (noterad i C-klav).</translation>
+        <translation>Mezzo-sopranstämma (noterad i C-klav).</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4795"/>
         <source>Mezzo-soprano (C clef)</source>
         <comment>mezzo-soprano-c-clef trackName</comment>
         <extracomment>trackName for Mezzo-soprano (C clef); Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Mezzosopran (C-klav)</translation>
+        <translation>Mezzo-sopran (C-klav)</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4797"/>
@@ -14951,7 +14951,7 @@
         <source>Electric piano.</source>
         <comment>electric-piano description</comment>
         <extracomment>description for Electric Piano; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Elpiano.</translation>
+        <translation>Elektriskt piano.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="4977"/>
@@ -15231,7 +15231,7 @@
         <source>Hammond organ with Leslie rotary speaker.</source>
         <comment>rotary-organ description</comment>
         <extracomment>description for Rotary Organ; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Hammondorgel med Lesliehögtalare.</translation>
+        <translation>Hammondorgel med Leslieförstärkare.</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="5067"/>
@@ -15259,7 +15259,7 @@
         <source>Harmonium.</source>
         <comment>harmonium description</comment>
         <extracomment>description for Harmonium; Please see https://github.com/musescore/MuseScore/wiki/Translating-instrument-names</extracomment>
-        <translation>Harmonium.</translation>
+        <translation>Harmonium</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="5076"/>
@@ -20255,7 +20255,7 @@
     <message>
         <location filename="../instruments/instrumentsxml.h" line="121"/>
         <source>Accordions</source>
-        <translation>Dragspel</translation>
+        <translation>Accordion</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="122"/>
@@ -20570,7 +20570,7 @@
     <message>
         <location filename="../instruments/instrumentsxml.h" line="184"/>
         <source>Balalaikas</source>
-        <translation>Balalajkor</translation>
+        <translation>Balalaikor</translation>
     </message>
     <message>
         <location filename="../instruments/instrumentsxml.h" line="185"/>

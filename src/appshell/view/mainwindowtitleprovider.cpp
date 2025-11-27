@@ -23,6 +23,7 @@
 #include "translation.h"
 
 using namespace mu::appshell;
+using namespace mu::notation;
 
 MainWindowTitleProvider::MainWindowTitleProvider(QObject* parent)
     : QObject(parent), muse::Injectable(muse::iocCtxForQmlObject(this))
@@ -106,7 +107,7 @@ void MainWindowTitleProvider::update()
         return;
     }
 
-    notation::INotationPtr notation = context()->currentNotation();
+    INotationPtr notation = context()->currentNotation();
     setTitle(notation->projectNameAndPartName());
 
     setFilePath((project->isNewlyCreated() || project->isCloudProject())

@@ -47,7 +47,6 @@
 #include "engraving/dom/text.h"
 #include "engraving/dom/tie.h"
 #include "engraving/dom/utils.h"
-#include "engraving/editing/transpose.h"
 #include "engraving/engravingerrors.h"
 
 #include "log.h"
@@ -560,7 +559,7 @@ Err importBB(MasterScore* score, const QString& name)
         Key cKey = key;
         Interval v = staff->part()->instrument(tick)->transpose();
         if (!v.isZero() && !score->style().styleB(Sid::concertPitch)) {
-            cKey = Transpose::transposeKey(key, v);
+            cKey = transposeKey(key, v);
             // if there are more than 6 accidentals in transposing key, it cannot be PreferSharpFlat::AUTO
             if ((key > 6 || key < -6) && staff->part()->preferSharpFlat() == PreferSharpFlat::AUTO) {
                 staff->part()->setPreferSharpFlat(PreferSharpFlat::NONE);

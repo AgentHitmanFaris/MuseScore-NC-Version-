@@ -23,9 +23,10 @@ import QtQuick 2.15
 import QtQuick.Layouts 1.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import MuseScore.AppShell 1.0
-import MuseScore.Preferences
+
+import "../shared"
 
 Page {
     id: root

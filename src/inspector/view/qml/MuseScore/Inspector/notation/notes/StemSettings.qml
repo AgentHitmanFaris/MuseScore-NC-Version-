@@ -23,7 +23,7 @@ import QtQuick 2.15
 import QtQuick.Controls 2.15
 
 import Muse.Ui 1.0
-import Muse.UiComponents
+import Muse.UiComponents 1.0
 import MuseScore.Inspector 1.0
 
 import "../../common"
@@ -167,7 +167,6 @@ FocusableItem {
 
                         titleText: qsTrc("inspector", "Thickness")
                         propertyItem: root.stemModel ? root.stemModel.thickness : null
-                        measureUnitsSymbol: qsTrc("global", "sp")
 
                         maxValue: 4
                         minValue: 0.01
@@ -186,7 +185,6 @@ FocusableItem {
 
                         titleText: qsTrc("inspector", "Length")
                         propertyItem: root.stemModel ? root.stemModel.length : null
-                        measureUnitsSymbol: qsTrc("global", "sp")
 
                         maxValue: 10
                         minValue: -10
@@ -201,7 +199,6 @@ FocusableItem {
                     id: stemOffsetSection
                     titleText: qsTrc("inspector", "Stem offset")
                     propertyItem: root.stemModel ? root.stemModel.offset : null
-                    measurementUnits: root.stemModel?.measurementUnits ?? CommonTypes.UNITS_UNKNOWN
 
                     navigationName: "StemOffset"
                     navigationPanel: root.navigationPanel
@@ -211,7 +208,6 @@ FocusableItem {
                 OffsetSection {
                     titleText: qsTrc("inspector", "Flag offset")
                     propertyItem: root.hookModel ? root.hookModel.offset : null
-                    measurementUnits: root.hookModel?.measurementUnits ?? CommonTypes.UNITS_UNKNOWN
 
                     navigationName: "FlagOffset"
                     navigationPanel: root.navigationPanel

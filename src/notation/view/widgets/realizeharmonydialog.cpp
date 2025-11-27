@@ -116,10 +116,11 @@ void RealizeHarmonyDialog::setChordList(const QList<Harmony*>& hlist)
         int rootTpc = h->rootTpc();
 
         noteNames = tpc2name(rootTpc, mu::engraving::NoteSpellingType::STANDARD, mu::engraving::NoteCaseType::AUTO);
-        const mu::engraving::RealizedHarmony::PitchMap& notes = h->getRealizedHarmony().notes();
-
-        for (const auto& [pitch, tpc] : notes) {
+        mu::engraving::RealizedHarmony::PitchMap map = h->getRealizedHarmony().notes();
+        for (int pitch : muse::keys(map)) {
             intervals += QString::number((pitch - mu::engraving::tpc2pitch(rootTpc)) % 128 % 12) + " ";
+        }
+        for (int tpc : muse::values(map)) {
             noteNames += u", " + mu::engraving::tpc2name(tpc, mu::engraving::NoteSpellingType::STANDARD, mu::engraving::NoteCaseType::AUTO);
         }
 

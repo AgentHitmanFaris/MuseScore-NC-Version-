@@ -135,7 +135,7 @@ bool MscSaver::writeMscz(MasterScore* score, MscWriter& mscWriter, bool createTh
                 continue;
             }
             ByteArray data = ip->buffer();
-            mscWriter.addImageFile(String::fromStdString(ip->hashName()), data);
+            mscWriter.addImageFile(ip->hashName(), data);
         }
     }
 

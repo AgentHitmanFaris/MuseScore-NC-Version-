@@ -91,9 +91,7 @@ private:
 
     struct RenderingInfo {
         long long maxChunksDurationUs = 0;
-        int errorCode = 0;
-        std::string errorText;
-        std::string errorData;
+        std::string error;
         int64_t percentage = 0;
         audio::InputProcessingProgress::ChunkInfoList lastReceivedChunks;
 

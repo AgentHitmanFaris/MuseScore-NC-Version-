@@ -76,16 +76,22 @@ private:
     bool openDevice(QIODevice* device, QIODevice::OpenModeFlag flags);
     void closeDevice(QIODevice* device);
 
+    bool isAborted() const;
+
     void prepareReplyReceive(QNetworkReply* reply, IncomingDevice* incomingData);
     void prepareReplyTransmit(QNetworkReply* reply);
 
-    Ret waitForReplyFinished(QNetworkReply* reply);
+    Ret waitForReplyFinished(QNetworkReply* reply, int timeoutMs);
     Ret errorFromReply(const QNetworkReply* reply) const;
+
+    static String requestTypeToString(RequestType type);
 
     QNetworkAccessManager* m_manager = nullptr;
     IncomingDevice* m_incomingData = nullptr;
     QNetworkReply* m_reply = nullptr;
     Progress m_progress;
+
+    bool m_isAborted = false;
 };
 }
 

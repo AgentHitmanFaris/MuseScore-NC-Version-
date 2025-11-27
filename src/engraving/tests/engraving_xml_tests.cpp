@@ -54,7 +54,6 @@ TEST_F(Engraving_XMLTests, readHTML)
         xml.writeXml(u"xmlTag", XML_TEXT_VERBOSE);
 
         xml.endElement();
-        xml.flush();
 
         EXPECT_NE(data.size(), 0);
         buf.close();

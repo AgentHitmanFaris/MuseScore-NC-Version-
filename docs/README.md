@@ -18,78 +18,40 @@ This is where static documentation is stored in the jsdoc format.
 * Tutorials - see [jsdoc documentation about tutorials](https://jsdoc.app/about-tutorials). 
 
 
-### Description of API  
+### Description of API methods
 
-Descriptions of API methods are located in `.cpp,.h` files where the implementation of the methods is located.   
+Descriptions of API methods are located in `cpp` files where the implementation of the methods is located.
 The description is in `jsdoc` format (see [https://jsdoc.app](https://jsdoc.app)), but the first line should indicate that this is APIDOC documentation.  
-
-#### Namesapces 
-Like `api.log.`, `api.interactive.`...
-
+Example:
 ```
-/** APIDOC
+/** APIDOC namespace: log
  * Write messages to log and console
- * @namespace log
+ * @namespace
  */
 LogApi::LogApi(api::IApiEngine* e)
     : ApiObject(e)
 {
 }
-```
-There must be the `@namespace` tag with the namespace name   
 
-#### Classes (types)
-
-```
-/** APIDOC
- * Class representing a lyric.
- * @class Lyric
- * @hideconstructor
-*/
-class Lyric : public EngravingItem
-{
-    ...
-```
-
-There must be the `@class` tag with the class name   
-If the type cannot be created in js using the new operator,   
-then we need to add the `@hideconstructor` tag
-
-#### Methods
-
-```
-/** APIDOC
- * Show information message
- * @method
- * @param {String} title Title
- * @param {String} text Message
+/** APIDOC method
+ * Write error message with default tag
+ * @param {String} message Message
  */
- void InteractiveApi::info(const QString& contentTitle, const QString& text)
+void LogApi::error(const QString& message)
 {
- ```
-There must be the `@method` tag 
+    error("Api", message);
+}
 
-#### Properties
-
+/** APIDOC method
+ * Write error message with tag
+ * @param {String} tag Tag
+ * @param {String} message Message
+ */
+void LogApi::error(const QString& tag, const QString& message)
+{
+    LOGE_T(tag.toStdString())() << message;
+}
 ```
-/** APIDOC @property {number} - count of lyrics */
-int Score::lyricCount() const
-```
-There must be the `@property` tag, the description should be in one line
-
-#### Enums
-
-```
-    /** APIDOC
-     * Question buttons
-     * @enum
-     */
-    enum Button {
-        ...
-    };    
-```
-There must be the `@enum` tag
-
    
 When generating documentation, we first extract this documentation from the `cpp` files.   
    

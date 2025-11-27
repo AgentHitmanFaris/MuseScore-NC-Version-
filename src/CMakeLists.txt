@@ -77,10 +77,6 @@ if (MUE_BUILD_PLAYBACK_MODULE)
     add_subdirectory(playback)
 endif()
 
-if (MUE_BUILD_PREFERENCES_MODULE)
-    add_subdirectory(preferences)
-endif()
-
 if (MUE_BUILD_PRINT_MODULE)
     add_subdirectory(print)
 endif()

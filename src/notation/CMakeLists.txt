@@ -240,9 +240,8 @@ set(MODULE_LINK
     muse::draw
     engraving
     commonscene
-    muse::ui
     muse::uicomponents
-    muse::uicomponents_qml
+    muse::ui
     Qt::Quick
     Qt::StateMachine
     Qt::Widgets
