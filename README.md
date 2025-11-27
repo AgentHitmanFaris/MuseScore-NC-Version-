@@ -40,6 +40,41 @@ To see this workflow in action, you can look at how we fixed the bug in `buildsc
 
 For a more detailed walkthrough, please refer to the [DEVELOPMENT_WITH_GEMINI.md](DEVELOPMENT_WITH_GEMINI.md) file included in this repository.
 
+## Local Development (PC)
+
+If you prefer to develop or run the application locally on your own machine (outside of the Antigravity environment), follow these steps.
+
+**Note:** Ensure you have the required dependencies (CMake, Qt, C++ compiler) installed. See the [MuseScore Wiki](https://github.com/musescore/MuseScore/wiki/Set-up-developer-environment) for detailed environment setup.
+
+### 1. Getting Sources
+
+    git clone https://github.com/AgentHitmanFaris/MuseScore-NC-Version-.git
+    cd MuseScore-NC-Version-
+
+### 2. Building
+
+To compile Musescore NC Version, use the included `build.cmake` script.
+
+**Release Build:**
+
+    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Release
+
+**Debug Build:**
+
+    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug
+
+If you encounter build errors, you can clean the build directory by appending `clean`:
+
+    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug clean
+
+### 3. Running
+
+To start the application after building:
+
+    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Release run
+
+(Or use `Debug` if you built the debug version).
+
 ## Original Features
 
 Musescore NC Version retains all the powerful features of the original MuseScore Studio:
