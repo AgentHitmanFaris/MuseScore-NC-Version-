@@ -144,4 +144,3 @@ FocusableItem {
         visible: root.model ? !root.model.areSettingsAvailable : false
     }
 }
-

@@ -18,7 +18,7 @@
         "template": "./template",
         "encoding": "utf8",               
         "destination": "./out/",          
-        "recurse": false,                  
+        "recurse": false,
         "version": false,
         "search": false,
         "theme_opts": {

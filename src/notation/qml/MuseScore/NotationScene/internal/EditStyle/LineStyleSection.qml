@@ -71,4 +71,3 @@ ColumnLayout {
         step: 0.1
     }
 }
-

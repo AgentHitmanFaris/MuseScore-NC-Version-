@@ -18,11 +18,11 @@ This is where static documentation is stored in the jsdoc format.
 * Tutorials - see [jsdoc documentation about tutorials](https://jsdoc.app/about-tutorials). 
 
 
-### Description of API methods 
+### Description of API methods
 
-Descriptions of API methods are located in `cpp` files where the implementation of the methods is located.   
+Descriptions of API methods are located in `cpp` files where the implementation of the methods is located.
 The description is in `jsdoc` format (see [https://jsdoc.app](https://jsdoc.app)), but the first line should indicate that this is APIDOC documentation.  
-Example:  
+Example:
 ```
 /** APIDOC namespace: log
  * Write messages to log and console

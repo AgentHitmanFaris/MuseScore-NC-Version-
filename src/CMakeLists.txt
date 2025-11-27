@@ -87,5 +87,3 @@ endif()
 
 # Stubs
 add_subdirectory(stubs)
-
-
