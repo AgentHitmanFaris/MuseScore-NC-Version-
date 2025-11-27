@@ -275,6 +275,36 @@ DockPage {
         },
 
         DockPanel {
+            id: pianoRollPanel
+
+            objectName: "pianoRollPanel"
+            title: qsTrc("appshell", "Drum Piano Roll")
+
+            height: 300
+            minimumHeight: root.horizontalPanelMinHeight
+            maximumHeight: root.horizontalPanelMaxHeight
+
+            minimumWidth: root.panelMinDimension
+            maximumWidth: root.panelMaxDimension
+
+            groupName: root.horizontalPanelsGroup
+
+            //! NOTE: hidden by default
+            visible: false
+
+            location: Location.Bottom
+
+            dropDestinations: root.horizontalPanelDropDestinations
+
+            navigationSection: root.navigationPanelSec(pianoRollPanel.location)
+
+            PianoRollPanel {
+                //navigationSection: pianoRollPanel.navigationSection
+                //contentNavigationPanelOrderStart: pianoRollPanel.contentNavigationPanelOrderStart
+            }
+        },
+
+        DockPanel {
             id: layoutPanel
 
             objectName: root.pageModel.layoutPanelName()
