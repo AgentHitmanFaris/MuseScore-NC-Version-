@@ -4,8 +4,6 @@ import MuseScore.NotationScene 1.0
 
 Rectangle {
     id: root
-    width: 800
-    height: 600
     color: "lightgray"
 
     PianoRollController {
@@ -31,6 +29,7 @@ Rectangle {
                     Text {
                         text: "Drums"
                         anchors.centerIn: parent
+                        color: "white"
                     }
                 }
 
@@ -44,9 +43,11 @@ Rectangle {
                         width: 40
                         height: 40
                         border.color: "black"
+                        color: "darkgray"
                         Text {
                             text: index + 1
                             anchors.centerIn: parent
+                            color: "white"
                         }
                     }
                     interactive: false
@@ -76,6 +77,7 @@ Rectangle {
                         width: 150
                         height: 40
                         border.color: "black"
+                        color: "lightgray"
                         Text {
                             text: modelData
                             anchors.centerIn: parent
@@ -87,7 +89,7 @@ Rectangle {
 
                 GridView {
                     id: grid
-                    width: 800 - drumLanes.width
+                    width: Math.max(800 - drumLanes.width, scrollView.width - drumLanes.width)
                     height: drumLanes.contentHeight
                     cellWidth: 40
                     cellHeight: 40
@@ -96,6 +98,7 @@ Rectangle {
                         width: 40
                         height: 40
                         border.color: "black"
+                        color: "white"
                         MouseArea {
                             anchors.fill: parent
                             onClicked: {
