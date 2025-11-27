@@ -4,11 +4,11 @@
 
 Extensions are a way to extend the basic functionality and add new features to the application.  
   
-The application has built-in extensions, we can find them at Home - Plugins. We can also install third-party extensions.   
+The application has built-in extensions, we can find them at Home - Plugins. We can also install third-party extensions.
    
 *TODO how install third-party*
    
-Before the extension will work, we need to enable it. This can be done at Home - Plugins. Enabled extensions will be available for calling from the Menu - Plugins.  
+Before the extension will work, we need to enable it. This can be done at Home - Plugins. Enabled extensions will be available for calling from the Menu - Plugins.
 
    
 ## Development

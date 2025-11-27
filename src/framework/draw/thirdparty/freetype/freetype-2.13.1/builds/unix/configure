@@ -12173,7 +12173,7 @@ if test ${lt_cv_dlopen_self+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  	  if test yes = "$cross_compiling"; then :
+	  if test yes = "$cross_compiling"; then :
   lt_cv_dlopen_self=cross
 else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
@@ -12280,7 +12280,7 @@ if test ${lt_cv_dlopen_self_static+y}
 then :
   printf %s "(cached) " >&6
 else $as_nop
-  	  if test yes = "$cross_compiling"; then :
+	  if test yes = "$cross_compiling"; then :
   lt_cv_dlopen_self_static=cross
 else
   lt_dlunknown=0; lt_dlno_uscore=1; lt_dlneed_uscore=2
