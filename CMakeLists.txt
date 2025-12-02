@@ -22,6 +22,11 @@ cmake_minimum_required(VERSION 3.22) # Min. required by Qt 6.9
 
 project(MuseScore LANGUAGES C CXX)
 
+if (WIN32)
+    # Enforce Qt 6.8+ on Windows as requested
+    find_package(Qt6 6.8 REQUIRED COMPONENTS Core)
+endif()
+
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 

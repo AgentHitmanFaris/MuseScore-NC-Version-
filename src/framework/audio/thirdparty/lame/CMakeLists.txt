@@ -60,6 +60,10 @@ set(MODULE_USE_COVERAGE OFF)
 
 setup_module()
 
+if (OS_IS_LIN)
+    target_compile_options(${MODULE} PRIVATE -fPIC)
+endif()
+
 #target_no_warning(${MODULE} -Wunused-const-variable=0)
 target_no_warning(${MODULE} -Wno-unused-parameter)
 target_no_warning(${MODULE} -Wno-unused-variable)
