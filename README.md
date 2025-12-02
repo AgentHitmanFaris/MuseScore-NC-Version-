@@ -6,8 +6,9 @@
 
 We have made specific improvements to the codebase to enhance robustness and developer experience:
 
-1.  **Fixed Soundfont Download Script**: Updated `buildscripts/cmake/DownloadSoundFont.cmake` to correctly check the status of auxiliary file downloads (License, Changelog, Readme). It now logs warnings instead of silently failing if these files cannot be retrieved.
-2.  **Integrated Gemini CLI Guide**: Added comprehensive documentation on how to leverage the Gemini CLI for finding bugs, understanding code, and generating fixes.
+1.  **Simplified Development (Windows)**: Added `dev.bat` to automate build commands.
+2.  **Fixed Soundfont Download Script**: Updated `buildscripts/cmake/DownloadSoundFont.cmake` to correctly check the status of auxiliary file downloads (License, Changelog, Readme). It now logs warnings instead of silently failing if these files cannot be retrieved.
+3.  **Integrated Gemini CLI Guide**: Added comprehensive documentation on how to leverage the Gemini CLI for finding bugs, understanding code, and generating fixes.
 
 ## Development Guide: Gemini CLI in Antigravity
 
@@ -40,40 +41,45 @@ To see this workflow in action, you can look at how we fixed the bug in `buildsc
 
 For a more detailed walkthrough, please refer to the [DEVELOPMENT_WITH_GEMINI.md](DEVELOPMENT_WITH_GEMINI.md) file included in this repository.
 
-## Local Development (PC)
+## Windows 11 Development
 
-If you prefer to develop or run the application locally on your own machine (outside of the Antigravity environment), follow these steps.
+This repository is optimized for development on Windows 11.
 
-**Note:** Ensure you have the required dependencies (CMake, Qt, C++ compiler) installed. See the [MuseScore Wiki](https://github.com/musescore/MuseScore/wiki/Set-up-developer-environment) for detailed environment setup.
+### Prerequisites
 
-### 1. Getting Sources
+1.  **Visual Studio 2022**: Install the "Desktop development with C++" workload.
+2.  **Qt 6.8+**: Use the Qt Online Installer to install Qt 6.8 or newer (MSVC 2022 64-bit).
+    *   *Note: The codebase requires recent Qt features (e.g. `QDirListing`) that are not available in older versions.*
+3.  **CMake**: Usually included with Visual Studio, or install separately.
+4.  **Ninja**: (Optional) Recommended for faster builds.
 
-    git clone https://github.com/AgentHitmanFaris/MuseScore-NC-Version-.git
-    cd MuseScore-NC-Version-
+### Building and Running
 
-### 2. Building
+Use the provided `dev.bat` script in the Command Prompt or PowerShell:
 
-To compile Musescore NC Version, use the included `build.cmake` script.
+**Build (Debug):**
 
-**Release Build:**
+    dev.bat build
 
-    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Release
+**Run:**
 
-**Debug Build:**
+    dev.bat run
 
-    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug
+**Build (Release):**
 
-If you encounter build errors, you can clean the build directory by appending `clean`:
+    dev.bat release
 
-    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug clean
+**Clean Build:**
 
-### 3. Running
+    dev.bat clean
 
-To start the application after building:
+### VSCode / Antigravity
 
-    cmake -P build.cmake -DCMAKE_BUILD_TYPE=Release run
+We have included `.vscode` configuration files. You can use the **Tasks: Run Task** command to build directly from your editor.
 
-(Or use `Debug` if you built the debug version).
+## Linux Development
+
+Legacy scripts (`setup_linux.sh`, `dev.sh`) are provided for Linux, but building requires a manual installation of Qt 6.8+, as most system package managers provide older versions (e.g. Qt 6.4) which are not compatible with this codebase.
 
 ## Original Features
 
