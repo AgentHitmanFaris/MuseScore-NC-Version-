@@ -41,6 +41,8 @@ To see this workflow in action, you can look at how we fixed the bug in `buildsc
 
 For a more detailed walkthrough, please refer to the [DEVELOPMENT_WITH_GEMINI.md](DEVELOPMENT_WITH_GEMINI.md) file included in this repository.
 
+> **Tip**: Check out the [DAILY_CHECKLIST.md](DAILY_CHECKLIST.md) for a recommended daily workflow.
+
 ## Windows 11 Development
 
 This repository is optimized for development on Windows 11.
