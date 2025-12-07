@@ -12,6 +12,12 @@ This checklist is designed to help you maintain a productive and stable workflow
     *   Ensure the Gemini CLI is connected and active.
     *   `gemini --version`
     *   *(Optional)* Ensure git hooks are installed (run once per machine): `hooks/install.sh`
+    *   Pull the latest changes from the remote repository to minimize merge conflicts.
+    *   `git pull origin main` (or your current working branch)
+
+2.  **Verify Environment**:
+    *   Ensure the Gemini CLI is connected and active.
+    *   Run: `gemini --version`
 
 3.  **Health Check Build**:
     *   Run a quick build to ensure the current state of the codebase works on your machine.
