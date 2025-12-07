@@ -119,6 +119,11 @@ while(i LESS "${nargs}")
         set(ARG_INSTALL "TRUE")
     elseif("${ARG}" STREQUAL "run")
         set(ARG_RUN "TRUE")
+    elseif("${ARG}" STREQUAL "test")
+        set(ARG_CONFIGURE "TRUE")
+        set(ARG_BUILD "TRUE")
+        set(ARG_TEST "TRUE")
+        list(APPEND CONFIGURE_ARGS "-DMUSE_ENABLE_UNIT_TESTS=ON")
     else()
         # Other arguments are used by certain subprocesses in build steps
         if(ARG_RUN)
@@ -291,6 +296,19 @@ if(ARG_RUN)
     )
     if(NOT "${EXIT_STATUS}" EQUAL "0")
         message(FATAL_ERROR "Run step failed with status ${EXIT_STATUS}. See output above for details.")
+    endif()
+endif()
+
+# Test - run unit tests.
+if(ARG_TEST)
+    message("\n~~~~ Actualizing Test step ~~~~\n")
+    execute_process(
+        COMMAND ctest --output-on-failure --parallel "${CPUS}"
+        WORKING_DIRECTORY "${BUILD_PATH}"
+        RESULT_VARIABLE EXIT_STATUS
+    )
+    if(NOT "${EXIT_STATUS}" EQUAL "0")
+        message(FATAL_ERROR "Test step failed with status ${EXIT_STATUS}.")
     endif()
 endif()
 
