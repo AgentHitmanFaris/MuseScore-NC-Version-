@@ -48,6 +48,10 @@ case $COMMAND in
         echo "Running MuseScore..."
         cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug run
         ;;
+    test)
+        echo "Building and Running Tests..."
+        cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug test
+        ;;
     clean)
         echo "Cleaning build directory..."
         cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug clean

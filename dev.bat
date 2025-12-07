@@ -9,6 +9,7 @@ if "%1"=="setup" goto setup
 if "%1"=="build" goto build
 if "%1"=="release" goto release
 if "%1"=="run" goto run
+if "%1"=="test" goto test
 if "%1"=="clean" goto clean
 if "%1"=="help" goto help
 
@@ -46,6 +47,11 @@ echo Running MuseScore...
 cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug run
 goto end
 
+:test
+echo Building and Running Tests...
+cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug test
+goto end
+
 :clean
 echo Cleaning build directory...
 cmake -P build.cmake -DCMAKE_BUILD_TYPE=Debug clean
@@ -59,6 +65,7 @@ echo   setup       Show setup instructions
 echo   build       Build MuseScore (Debug mode)
 echo   release     Build MuseScore (Release mode)
 echo   run         Run the compiled MuseScore (Debug mode)
+echo   test        Build and run unit tests
 echo   clean       Clean the build directory
 echo   help        Show this help message
 echo.
