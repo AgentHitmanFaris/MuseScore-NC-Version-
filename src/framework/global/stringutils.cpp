@@ -21,154 +21,174 @@
  */
 #include "stringutils.h"
 
-#include <cctype>
 #include <algorithm>
+#include <cctype>
 
-bool muse::strings::replace(std::string& str, const std::string& from, const std::string& to)
-{
-    size_t start_pos = str.find(from);
-    if (start_pos == std::string::npos) {
-        return false;
-    }
-    str.replace(start_pos, from.length(), to);
-    return true;
+bool muse::strings::replace(std::string &str, const std::string &from,
+                            const std::string &to) {
+  size_t start_pos = str.find(from);
+  if (start_pos == std::string::npos) {
+    return false;
+  }
+  str.replace(start_pos, from.length(), to);
+  return true;
 }
 
-void muse::strings::split(const std::string& str, std::vector<std::string>& out, const std::string& delim)
-{
-    std::size_t current, previous = 0;
-    current = str.find(delim);
-    std::size_t delimLen = delim.length();
+void muse::strings::split(const std::string &str, std::vector<std::string> &out,
+                          const std::string &delim) {
+  std::size_t current, previous = 0;
+  current = str.find(delim);
+  std::size_t delimLen = delim.length();
 
-    while (current != std::string::npos) {
-        out.push_back(str.substr(previous, current - previous));
-        previous = current + delimLen;
-        current = str.find(delim, previous);
-    }
+  while (current != std::string::npos) {
     out.push_back(str.substr(previous, current - previous));
+    previous = current + delimLen;
+    current = str.find(delim, previous);
+  }
+  out.push_back(str.substr(previous, current - previous));
 }
 
-std::string muse::strings::join(const std::vector<std::string>& strs, const std::string& sep)
-{
-    std::string str;
-    bool first = true;
-    for (const std::string& s : strs) {
-        if (!first) {
-            str += sep;
-        }
-        first = false;
-        str += s;
+std::string muse::strings::join(const std::vector<std::string> &strs,
+                                const std::string &sep) {
+  if (strs.empty()) {
+    return {};
+  }
+
+  size_t len = 0;
+  size_t sep_len = sep.length();
+  for (const auto &s : strs) {
+    len += s.length();
+  }
+  len += sep_len * (strs.size() - 1);
+
+  std::string str;
+  str.reserve(len);
+
+  bool first = true;
+  for (const auto &s : strs) {
+    if (!first) {
+      str += sep;
     }
-    return str;
+    first = false;
+    str += s;
+  }
+  return str;
 }
 
-void muse::strings::ltrim(std::string& s)
-{
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
-        return !std::isspace(ch);
-    }));
+void muse::strings::ltrim(std::string &s) {
+  s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+            return !std::isspace(ch);
+          }));
 }
 
-void muse::strings::rtrim(std::string& s)
-{
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](int ch) {
-        return !std::isspace(ch);
-    }).base(), s.end());
+void muse::strings::rtrim(std::string &s) {
+  s.erase(std::find_if(s.rbegin(), s.rend(),
+                       [](int ch) { return !std::isspace(ch); })
+              .base(),
+          s.end());
 }
 
-void muse::strings::trim(std::string& s)
-{
-    ltrim(s);
-    rtrim(s);
+void muse::strings::trim(std::string &s) {
+  ltrim(s);
+  rtrim(s);
 }
 
-std::string muse::strings::toLower(const std::string& source)
-{
-    std::string str = source;
-    std::for_each(str.begin(), str.end(), [](char& c) {
-        c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
-    });
-    return str;
+std::string muse::strings::toLower(const std::string &source) {
+  std::string str = source;
+  std::for_each(str.begin(), str.end(), [](char &c) {
+    c = static_cast<char>(std::tolower(static_cast<unsigned char>(c)));
+  });
+  return str;
 }
 
-bool muse::strings::startsWith(const std::string& str, const std::string& start)
-{
-    if (str.size() < start.size()) {
-        return false;
+bool muse::strings::startsWith(const std::string &str,
+                               const std::string &start) {
+  if (str.size() < start.size()) {
+    return false;
+  }
+
+  return str.compare(0, start.size(), start) == 0;
+}
+
+bool muse::strings::endsWith(const std::string &str,
+                             const std::string &ending) {
+  if (ending.size() > str.size()) {
+    return false;
+  }
+  return str.compare(str.size() - ending.size(), ending.size(), ending) == 0;
+}
+
+std::string muse::strings::leftJustified(const std::string &val, size_t width) {
+  std::string str;
+  str.resize(width, ' ');
+  size_t length = width < val.size() ? width : val.size();
+  for (size_t i = 0; i < length; ++i) {
+    str[i] = val[i];
+  }
+  return str;
+}
+
+bool muse::strings::lessThanCaseInsensitive(const std::string &lhs,
+                                            const std::string &rhs) {
+  // Compare case-insensitively character by character
+  auto it1 = lhs.begin();
+  auto it2 = rhs.begin();
+  auto end1 = lhs.end();
+  auto end2 = rhs.end();
+
+  while (it1 != end1 && it2 != end2) {
+    unsigned char c1 = std::tolower(static_cast<unsigned char>(*it1));
+    unsigned char c2 = std::tolower(static_cast<unsigned char>(*it2));
+    if (c1 != c2) {
+      return c1 < c2;
     }
+    ++it1;
+    ++it2;
+  }
 
-    for (size_t i = 0; i < start.size(); ++i) {
-        if (str.at(i) != start.at(i)) {
-            return false;
-        }
-    }
+  // Shorter string is less than longer string if it's a prefix
+  if (lhs.size() != rhs.size()) {
+    return lhs.size() < rhs.size();
+  }
 
-    return true;
+  // If strings are equal case-insensitively, fall back to case-sensitive
+  // comparison
+  return lhs < rhs;
 }
 
-bool muse::strings::endsWith(const std::string& str, const std::string& ending)
-{
-    if (ending.size() > str.size()) {
-        return false;
-    }
-    std::string ss = str.substr(str.size() - ending.size());
-    return ss.compare(ending.c_str()) == 0;
+bool muse::strings::lessThanCaseInsensitive(const String &lhs,
+                                            const String &rhs) {
+  String lhsLower = lhs.toLower(), rhsLower = rhs.toLower();
+  if (lhsLower == rhsLower) {
+    return lhs < rhs;
+  }
+
+  return lhsLower < rhsLower;
 }
 
-std::string muse::strings::leftJustified(const std::string& val, size_t width)
-{
-    std::string str;
-    str.resize(width, ' ');
-    size_t length = width < val.size() ? width : val.size();
-    for (size_t i = 0; i < length; ++i) {
-        str[i] = val[i];
+size_t muse::strings::levenshteinDistance(const std::string &s1,
+                                          const std::string &s2) {
+  size_t N1 = s1.length();
+  size_t N2 = s2.length();
+  size_t i, j;
+  std::vector<size_t> V(N2 + 1);
+
+  for (i = 0; i <= N2; i++) {
+    V[i] = i;
+  }
+
+  for (i = 0; i < N1; i++) {
+    V[0] = i + 1;
+    size_t corner = i;
+    for (j = 0; j < N2; j++) {
+      size_t upper = V[j + 1];
+      if (s1[i] == s2[j]) {
+        V[j + 1] = corner;
+      } else {
+        V[j + 1] = std::min(V[j], std::min(upper, corner)) + 1;
+      }
+      corner = upper;
     }
-    return str;
-}
-
-bool muse::strings::lessThanCaseInsensitive(const std::string& lhs, const std::string& rhs)
-{
-    int cmp = toLower(lhs).compare(toLower(rhs));
-    if (cmp == 0) {
-        return lhs < rhs;
-    }
-
-    return cmp < 0;
-}
-
-bool muse::strings::lessThanCaseInsensitive(const String& lhs, const String& rhs)
-{
-    String lhsLower = lhs.toLower(), rhsLower = rhs.toLower();
-    if (lhsLower == rhsLower) {
-        return lhs < rhs;
-    }
-
-    return lhsLower < rhsLower;
-}
-
-size_t muse::strings::levenshteinDistance(const std::string& s1, const std::string& s2)
-{
-    size_t N1 = s1.length();
-    size_t N2 = s2.length();
-    size_t i, j;
-    std::vector<size_t> V(N2 + 1);
-
-    for (i = 0; i <= N2; i++) {
-        V[i] = i;
-    }
-
-    for (i = 0; i < N1; i++) {
-        V[0] = i + 1;
-        size_t corner = i;
-        for (j = 0; j < N2; j++) {
-            size_t upper = V[j + 1];
-            if (s1[i] == s2[j]) {
-                V[j + 1] = corner;
-            } else {
-                V[j + 1] = std::min(V[j], std::min(upper, corner)) + 1;
-            }
-            corner = upper;
-        }
-    }
-    return V[N2];
+  }
+  return V[N2];
 }
