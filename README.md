@@ -75,6 +75,12 @@ Use the provided `dev.bat` script in the Command Prompt or PowerShell:
 
     dev.bat clean
 
+**Build with Ninja (Recommended for VS Code / Antigravity):**
+
+    dev.bat build -ninja
+
+Using the `-ninja` flag sets up the Visual Studio environment automatically and uses the Ninja build system, which is faster and integrates better with non-VS IDEs.
+
 ### VSCode / Antigravity
 
 We have included `.vscode` configuration files. You can use the **Tasks: Run Task** command to build directly from your editor.
